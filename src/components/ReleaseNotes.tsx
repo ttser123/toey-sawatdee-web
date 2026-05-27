@@ -16,6 +16,18 @@ type ReleaseNote = {
 // ==========================================
 const releaseNotes: ReleaseNote[] = [
   {
+    date: 'May 28, 2026',
+    isoDate: '2026-05-28',
+    title: 'Resume Management Terminal & UX Refactoring',
+    changes: [
+      '**Resume Management Terminal:** Engineered a specialized administrative sector at `/admin/resume` for document lifecycle management. Features direct AWS S3 synchronization and automated CloudFront Edge cache invalidation.',
+      '**Hardened Deployment Logic:** Implemented multi-layered validation for document uploads, including binary size clamping (10MB limit), MIME-type verification, and React-native `useRef` for deterministic DOM state management.',
+      '**Global Page Transitions:** Standardized application-wide navigation experience by implementing a unified CSS-based fade-in transition (`1000ms`) across all client-side routes via the root `ClientLayout`.',
+      '**Portfolio UI Refinement:** Optimized the "Direct Connection Channels" architecture. Transitioned the primary email display from a functional button to a high-visibility, non-actionable technical block for better visual hierarchy and UX consistency.',
+      '**Engineering Aesthetic Polish:** Standardized all UI labels to technical English, improved focal spacing in the Hero section, and synchronized technical icon palettes across administrative and public views.',
+    ]
+  },
+  {
     date: 'May 16, 2026',
     isoDate: '2026-05-16',
     title: 'Subnet Collision Solver (v2.2.0)',

@@ -157,7 +157,7 @@ export default function StatusDashboard() {
           </div>
           <div>
             <p className={`text-[10px] font-mono font-bold ${isError ? 'text-rose-600' : 'text-slate-600'}`}>
-              {isError ? 'CRITICAL_SIGNAL_LOSS' : 'ALL_SYSTEMS_NOMINAL'}
+              {isError ? 'CRITICAL SIGNAL LOSS' : 'ALL SYSTEMS NOMINAL'}
             </p>
           </div>
         </div>
@@ -255,7 +255,7 @@ export default function StatusDashboard() {
 
       {/* Sector: SYNC_LOG Terminal */}
       <div className="card-blueprint p-4 bg-slate-50/50">
-        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 mb-3">Live_Telemetry_Log</h3>
+        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 mb-3">Live TelemetryLog</h3>
         <div className="h-40 overflow-y-auto pr-2 space-y-1.5 custom-scrollbar">
           {logs.map((log) => (
             <div key={log.id} className="flex items-start gap-3 text-xs border-l-2 border-slate-200 pl-3 py-1 bg-white/30 rounded-r-sm">

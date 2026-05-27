@@ -61,6 +61,14 @@ The infrastructure is organized into five operational zones, all managed as Terr
 └─────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────┐
+│  ZONE 6 — STATIC ASSET MANAGEMENT  (S3 + CloudFront)                │
+│                                                                     │
+│  S3 Bucket ─ Private asset storage (toey-sawatdee-assets-prod)      │
+│  OAC (Origin Access Control) ─ Restricts S3 access to CloudFront    │
+│  Resume Terminal ─ Admin tool for S3 sync + Cache Invalidation      │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
 │  DEDICATED GAME SERVER  (Linux)                                     │
 │                                                                     │
 │  Guardian Agent (Node.js)                                           │
@@ -109,6 +117,15 @@ Route 53 is configured with an `origin.toey-sawatdee.me` A-record pointing direc
 ### Infrastructure as Code (Terraform)
 
 The entire AWS infrastructure — VPC, subnet, Internet Gateway, route table, security group, EC2 launch template, Elastic IP, CloudFront distribution, Route 53 records, and IAM roles — is declared in Terraform (AWS Provider 6.x). No manual console changes. The stack is reproducible from a single `terraform apply`.
+
+### Resume Management Terminal: S3 + CloudFront Invalidation
+
+The administrative sector at `/admin/resume` acts as a specialized deployment terminal for static assets. When a new resume is uploaded:
+1. The document is buffered and transmitted directly to the private S3 bucket.
+2. An automated CloudFront Invalidation request is triggered via the AWS SDK.
+3. The Edge network synchronizes the new document globally within ~60 seconds.
+
+This eliminates the need for manual S3 console uploads and ensures that public-facing documents are always in sync with the latest administrative deployment.
 
 ### Serverless Routing: GET vs POST Isolation
 

@@ -15,7 +15,7 @@ import {
 const STATIC_HERO: HeroSection = {
   name: "Parinya Sawatdee",
   nickname: "Toey",
-  headline: "",
+  headline: "Motivated Software Engineer with a solid foundation in AWS and Next.js. Eager to tackle real-world infrastructure challenges and scale alongside a high-performing team.",
   availability: "Available for Opportunities",
   resumeUrl: "/resume"
 };
@@ -35,7 +35,7 @@ export default function Home() {
   const closeResume = () => setIsResumeOpen(false);
 
   return (
-    <div className="flex flex-col min-h-[70vh] justify-center space-y-16 py-12 animate-in fade-in duration-1000">
+    <div className="flex flex-col min-h-[70vh] justify-center space-y-16 py-12">
       <PortfolioHero 
         data={STATIC_HERO} 
         onViewResume={openResume} 

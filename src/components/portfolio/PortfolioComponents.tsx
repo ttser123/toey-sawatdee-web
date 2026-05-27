@@ -33,7 +33,7 @@ export function PortfolioHero({ data, onViewResume }: { data: HeroSection; onVie
           </p>
         </div>
         
-        <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl mx-auto md:mx-0">
+        <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl mx-auto md:mx-0 mb-8">
           {data.headline}
         </p>
         
@@ -174,31 +174,46 @@ export function ContactSection({
           <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter font-mono">
             Direct Connection Channels
           </h3>
-          <p className="text-slate-400 text-[14px] font-mono uppercase tracking-[0.2em]">
-            สำหรับการติดต่อและร่วมงาน
+          <p className="text-slate-400 text-[10px] font-mono uppercase tracking-[0.3em]">
+            For professional inquiries and collaborations
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-          {contacts.map((contact, idx) => (
-            <a
-              key={idx}
-              href={contact.platform === 'Email' ? `mailto:${contact.value}` : contact.value}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex items-center gap-3 px-5 py-2.5 rounded-sm border border-slate-200 bg-white text-slate-500 transition-all group ${getHoverStyles(contact.platform)}`}
-            >
-              <span className="text-lg group-hover:scale-110 transition-transform">
-                {getIcon(contact.platform)}
-              </span>
-              <span className="text-xs font-black font-mono uppercase tracking-widest">
-                {contact.platform}
-              </span>
-            </a>
-          ))}
+        <div className="flex flex-col items-center gap-10">
+          {/* 1. Primary Social Links */}
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+            {contacts.filter(c => c.platform !== 'Email').map((contact, idx) => (
+              <a
+                key={idx}
+                href={contact.value}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-3 px-5 py-2.5 rounded-sm border border-slate-200 bg-white text-slate-500 transition-all group ${getHoverStyles(contact.platform)}`}
+              >
+                <span className="text-lg group-hover:scale-110 transition-transform">
+                  {getIcon(contact.platform)}
+                </span>
+                <span className="text-xs font-black font-mono uppercase tracking-widest">
+                  {contact.platform}
+                </span>
+              </a>
+            ))}
+          </div>
+
+          {/* 2. Focused Email (High Visibility) */}
+          {contacts.find(c => c.platform === 'Email') && (
+            <div className="flex flex-col items-center gap-3 py-6 px-8 border-t border-slate-100 w-full max-w-2xl">
+              <div className="flex items-center gap-4 text-slate-800">
+                <FaEnvelope className="text-base md:text-xl shrink-0 text-slate-800" />
+                <span className="text-lg sm:text-xl md:text-2xl font-black font-mono select-all hover:text-indigo-600 transition-colors cursor-text tracking-tight">
+                  {contacts.find(c => c.platform === 'Email')?.value}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="pt-8 border-t border-slate-100 flex flex-col items-center gap-4">
+        <div className="pt-4 flex flex-col items-center gap-4">
         </div>
       </div>
     </div>
