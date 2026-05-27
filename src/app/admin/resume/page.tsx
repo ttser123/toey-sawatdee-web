@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { HudHeader } from '@/components/HudHeader';
+import HudHeader from '@/components/HudHeader';
 
 export default function ResumeAdminPage() {
   const [file, setFile] = useState<File | null>(null);
