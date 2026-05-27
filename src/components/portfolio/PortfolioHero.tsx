@@ -39,8 +39,8 @@ export function PortfolioHero({ data }: { data: HeroSection }) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-slate-900 hover:bg-indigo-600 text-white font-black font-mono text-xs px-5 py-3 rounded-sm shadow-tactical transition-all hover:-translate-y-0.5 active:translate-y-0 uppercase tracking-widest"
             >
-              <span className="material-symbols-outlined text-base">download</span>
-              EXTRACT_RESUME.PDF
+              <span className="material-symbols-outlined text-base">visibility</span>
+              VIEW_RESUME.PDF
             </a>
 
             <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-sm">

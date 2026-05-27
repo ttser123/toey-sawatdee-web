@@ -37,6 +37,7 @@ const bottomNav = [
 
 const adminNav = [
   { href: '/admin/admin-log', icon: 'dns', label: 'Admin Log' },
+  { href: '/admin/resume', icon: 'description', label: 'Resume' },
 ];
 
 // ── A11y IDs ─────────────────────────────────────────────────────────

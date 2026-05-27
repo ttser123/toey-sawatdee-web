@@ -8,7 +8,7 @@ export const portfolioData: PortfolioData = {
     title: "Full-Stack Developer & Cloud Engineer",
     headline: "Architecting edge-optimized cloud infrastructures and high-performance web applications with absolute technical control.",
     availability: "Open for Full-time (Remote / Hybrid)",
-    resumeUrl: "/resume.pdf", 
+    resumeUrl: "/resume", 
   },
   metrics: [
     { label: "Projects Completed", value: "15+" },

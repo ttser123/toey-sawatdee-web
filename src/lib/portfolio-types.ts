@@ -5,7 +5,7 @@ export interface HeroSection {
   nickname?: string;
   title: string;        
   headline: string;     
-  avatarUrl: string;
+  avatarUrl?: string;
   availability: string; // e.g., "Open for Full-time (Remote / Hybrid)"
   resumeUrl: string;    // PDF Link
 }

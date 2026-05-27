@@ -3,11 +3,9 @@
 
 import { portfolioData } from '@/lib/portfolio-data';
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero';
-import { MetricSnapshot } from '@/components/portfolio/MetricSnapshot';
 import { SkillSection } from '@/components/portfolio/SkillSection';
 import { ExperienceSection } from '@/components/portfolio/ExperienceSection';
 import { ProjectSection } from '@/components/portfolio/ProjectSection';
-import { EducationSection } from '@/components/portfolio/EducationSection';
 import { ContactSection } from '@/components/portfolio/ContactSection';
 
 export default function Home() {
