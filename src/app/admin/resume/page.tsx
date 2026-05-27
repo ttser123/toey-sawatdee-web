@@ -139,9 +139,6 @@ export default function ResumeAdminPage() {
                     : 'bg-rose-50 text-rose-700 border-rose-200'
                 }`}>
                   <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm">
-                      {message.type === 'success' ? 'check circle' : 'warning'}
-                    </span>
                     {message.text}
                   </div>
                 </div>
