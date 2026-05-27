@@ -9,26 +9,20 @@ import { FaGithub, FaLinkedin, FaEnvelope, FaYoutube } from 'react-icons/fa';
 
 // ── Navigation Data ──────────────────────────────────────────────────
 
-/** Top-level simple links (no children) */
 const topNav = [
   { href: '/', icon: 'person', label: 'Portfolio' },
   { href: '/overview', icon: 'bar_chart', label: 'Overview' },
 ];
 
-/** Games Server dropdown — collapsible with zone sub-items */
 interface GameZone {
   href: string;
   icon?: string;
   label: string;
-  zone?: string; // optional zone badge
+  zone?: string;
 }
 
-const gameServerItems: GameZone[] = [
-  // ── Add more game servers / zones here ──
-  // { href: '/admin/games-server/valheim', icon: 'shield', label: 'Valheim', zone: 'EU-W1' },
-];
+const gameServerItems: GameZone[] = [];
 
-/** Bottom simple links */
 const bottomNav = [
   { href: '/tools', icon: 'construction', label: 'Tools' },
   { href: '/status', icon: 'monitor_heart', label: 'Status' },
@@ -40,11 +34,72 @@ const adminNav = [
   { href: '/admin/resume', icon: 'description', label: 'Resume' },
 ];
 
-// ── A11y IDs ─────────────────────────────────────────────────────────
-
 const GAMES_DROPDOWN_ID = 'games-server-dropdown';
 
-// ── Component ────────────────────────────────────────────────────────
+// ── Sub-Components (Declared outside of render to prevent state resets) ──
+
+interface NavItemProps {
+  href: string;
+  icon: string;
+  label: string;
+  pathname: string;
+  isOpen: boolean;
+}
+
+const NavItem = ({ href, icon, label, pathname, isOpen }: NavItemProps) => {
+  const isActive = pathname === href;
+  return (
+    <Link
+      href={href}
+      title={!isOpen ? label : undefined}
+      className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium transition-colors ${isActive
+        ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
+        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
+        }`}
+    >
+      <span className="material-symbols-outlined text-lg shrink-0">{icon}</span>
+      <span className={`whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>{label}</span>
+    </Link>
+  );
+};
+
+interface GameNavItemProps extends GameZone {
+  pathname: string;
+  isOpen: boolean;
+}
+
+const GameNavItem = ({ href, icon, label, zone, pathname, isOpen }: GameNavItemProps) => {
+  const isActive = pathname === href;
+  return (
+    <Link
+      href={href}
+      title={!isOpen ? label : undefined}
+      className={`group relative flex items-center gap-2.5 pl-9 pr-3 py-2 rounded-sm text-[13px] font-medium transition-all duration-200 ${isActive
+        ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
+        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+        }`}
+    >
+      {icon && (
+        <span className={`material-symbols-outlined text-[16px] shrink-0 ${isActive ? 'text-indigo-500' : 'text-slate-400 group-hover:text-slate-600'}`}>
+          {icon}
+        </span>
+      )}
+      <span className={`whitespace-nowrap flex-1 truncate block ${isOpen ? 'md:block' : 'md:hidden'}`}>
+        {label}
+      </span>
+      {zone && (
+        <span className={`text-[9px] font-bold font-mono px-1.5 py-0.5 rounded-sm tracking-wider shrink-0 ${isOpen ? 'md:inline-flex' : 'md:hidden'} ${isActive
+          ? 'bg-indigo-100 text-indigo-500 border border-indigo-200'
+          : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-500 border border-slate-200'
+          }`}>
+          {zone}
+        </span>
+      )}
+    </Link>
+  );
+};
+
+// ── Main Component ───────────────────────────────────────────────────
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
@@ -52,44 +107,31 @@ export default function Sidebar() {
   const [visitorCount, setVisitorCount] = useState<number | string>('...');
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
-  // Auto-open dropdown if any child route is active
   const isGameRouteActive = gameServerItems.some((item) => pathname === item.href);
   const [gamesOpen, setGamesOpen] = useState(isGameRouteActive);
 
   // Sync dropdown open state when navigating to a game route
   useEffect(() => {
-    if (isGameRouteActive) setGamesOpen(true);
+    if (isGameRouteActive) {
+      setGamesOpen(true);
+    }
   }, [isGameRouteActive]);
 
-  // ── Fix #1: AbortController to prevent memory leak on unmount ──────
   useEffect(() => {
     const controller = new AbortController();
-
     const fetchCounter = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-        // ── Fix #5: Warn loudly when ENV is missing instead of silent bail ──
         if (!apiUrl) {
-          console.warn(
-            '[Sidebar] NEXT_PUBLIC_API_URL is not set — visitor counter disabled. ' +
-            'Check your .env.local or deployment environment variables.'
-          );
           setVisitorCount('N/A');
           return;
         }
-
-        // Backend increments on ALL HTTP methods (GET & POST both +1).
-        // To prevent inflating views: POST once per session, then use cached value.
         const cachedCount = sessionStorage.getItem('visitor_count');
-
         if (cachedCount) {
-          // Already counted this session — use cached value, zero API calls
           setVisitorCount(Number(cachedCount));
         } else {
-          // First page load this session — POST to increment (+1)
           const res = await fetch(`${apiUrl}/visitor`, {
             method: 'POST',
             signal: controller.signal,
@@ -102,32 +144,23 @@ export default function Sidebar() {
           }
         }
       } catch (err: unknown) {
-        // Ignore abort errors — they're expected on unmount
         if (err instanceof DOMException && err.name === 'AbortError') return;
-        console.error('[Sidebar] Counter fetch failed:', err);
         setVisitorCount('Error');
       }
     };
-
     fetchCounter();
-
-    // Cleanup: abort in-flight fetch if component unmounts mid-request
     return () => controller.abort();
   }, []);
 
-  // Close mobile sidebar on route change
   useEffect(() => {
     setIsMobileOpen(false);
   }, [pathname]);
 
-  // ── Fix #4: Escape key closes mobile sidebar ──────────────────────
   useEffect(() => {
     if (!isMobileOpen) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsMobileOpen(false);
     };
-
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isMobileOpen]);
@@ -137,62 +170,8 @@ export default function Sidebar() {
     router.replace('/');
   }, [logout, router]);
 
-  // ── Reusable NavItem ───────────────────────────────────────────────
-
-  const NavItem = ({ href, icon, label }: { href: string; icon: string; label: string }) => {
-    const isActive = pathname === href;
-    return (
-      <Link
-        href={href}
-        title={!isOpen ? label : undefined}
-        className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium transition-colors ${isActive
-          ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
-          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
-          }`}
-      >
-        <span className="material-symbols-outlined text-lg shrink-0">{icon}</span>
-        {/* On mobile, always show label since sidebar is 64 w. On desktop, respect isOpen */}
-        <span className={`whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>{label}</span>
-      </Link>
-    );
-  };
-
-  // ── Games Server Dropdown Item ─────────────────────────────────────
-
-  const GameNavItem = ({ href, icon, label, zone }: GameZone) => {
-    const isActive = pathname === href;
-    return (
-      <Link
-        href={href}
-        title={!isOpen ? label : undefined}
-        className={`group relative flex items-center gap-2.5 pl-9 pr-3 py-2 rounded-sm text-[13px] font-medium transition-all duration-200 ${isActive
-          ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
-          : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
-          }`}
-      >
-        {icon && (
-          <span className={`material-symbols-outlined text-[16px] shrink-0 ${isActive ? 'text-indigo-500' : 'text-slate-400 group-hover:text-slate-600'}`}>
-            {icon}
-          </span>
-        )}
-        <span className={`whitespace-nowrap flex-1 truncate block ${isOpen ? 'md:block' : 'md:hidden'}`}>
-          {label}
-        </span>
-        {zone && (
-          <span className={`text-[9px] font-bold font-mono px-1.5 py-0.5 rounded-sm tracking-wider shrink-0 ${isOpen ? 'md:inline-flex' : 'md:hidden'} ${isActive
-            ? 'bg-indigo-100 text-indigo-500 border border-indigo-200'
-            : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-500 border border-slate-200'
-            }`}>
-            {zone}
-          </span>
-        )}
-      </Link>
-    );
-  };
-
   return (
     <>
-      {/* ── Fix #7: Semantic <header> for Mobile Topbar ──────────── */}
       <header className="md:hidden flex items-center justify-between bg-white/90 backdrop-blur-sm border-b border-slate-200 h-14 px-4 shrink-0">
         <span className="font-semibold text-slate-800 text-sm">Portfolio</span>
         <button
@@ -204,7 +183,6 @@ export default function Sidebar() {
         </button>
       </header>
 
-      {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity"
@@ -213,7 +191,6 @@ export default function Sidebar() {
         />
       )}
 
-      {/* Actual Sidebar */}
       <aside
         className={`
           fixed inset-y-0 left-0 z-50 bg-white/95 backdrop-blur-sm border-r border-slate-200 flex flex-col shrink-0 transition-all duration-300 overflow-x-hidden
@@ -224,12 +201,8 @@ export default function Sidebar() {
         role="navigation"
         aria-label="Main navigation"
       >
-        {/* Header */}
         <div className="h-14 flex items-center justify-between px-3 border-b border-slate-200">
-          {/* Always show title on mobile, check isOpen on desktop */}
           <span className={`font-semibold text-slate-800 text-sm whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>Portfolio</span>
-
-          {/* Mobile close button */}
           <button
             onClick={() => setIsMobileOpen(false)}
             className="md:hidden p-1.5 rounded-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
@@ -237,12 +210,9 @@ export default function Sidebar() {
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
-
-          {/* Desktop toggle button — Fix #3: aria-expanded */}
           <button
             onClick={() => {
               if (isOpen && gamesOpen) {
-                // Collapse dropdown first, then sidebar after animation finishes
                 setGamesOpen(false);
                 setTimeout(() => setIsOpen(false), 300);
               } else {
@@ -257,19 +227,13 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 p-2 space-y-1 overflow-y-auto" aria-label="Site pages">
-          {/* Top navigation items */}
           {topNav.map((item) => (
-            <NavItem key={item.href} {...item} />
+            <NavItem key={item.href} {...item} pathname={pathname} isOpen={isOpen} />
           ))}
-
-          {/* Bottom navigation items */}
           {bottomNav.map((item) => (
-            <NavItem key={item.href} {...item} />
+            <NavItem key={item.href} {...item} pathname={pathname} isOpen={isOpen} />
           ))}
-
-          {/* Admin zone — Only when authenticated */}
           {isAuthenticated && (
             <>
               <div className="border-t border-slate-200 my-3" />
@@ -277,16 +241,12 @@ export default function Sidebar() {
                 Admin
               </p>
               {adminNav.map((item) => (
-                <NavItem key={item.href} {...item} />
+                <NavItem key={item.href} {...item} pathname={pathname} isOpen={isOpen} />
               ))}
-
-              {/* ── Games Server Dropdown ─────────────────────────── */}
               <div className="mt-1">
-                {/* Fix #3: aria-expanded + aria-controls for A11y */}
                 <button
                   onClick={() => {
                     if (!isOpen) {
-                      // Sidebar is collapsed — expand it first, then open dropdown
                       setIsOpen(true);
                       setTimeout(() => setGamesOpen(true), 300);
                     } else {
@@ -307,35 +267,25 @@ export default function Sidebar() {
                   <span className={`whitespace-nowrap flex-1 text-left block ${isOpen ? 'md:block' : 'md:hidden'}`}>
                     Games Server
                   </span>
-                  {/* Chevron indicator — hidden when sidebar is collapsed */}
                   {isOpen && (
-                    <span
-                      className={`material-symbols-outlined text-[16px] shrink-0 transition-transform duration-300 ${gamesOpen ? 'rotate-180' : 'rotate-0'
-                        } ${isGameRouteActive ? 'text-indigo-400' : 'text-slate-400'}`}
-                    >
+                    <span className={`material-symbols-outlined text-[16px] shrink-0 transition-transform duration-300 ${gamesOpen ? 'rotate-180' : 'rotate-0'} ${isGameRouteActive ? 'text-indigo-400' : 'text-slate-400'}`}>
                       expand_more
                     </span>
                   )}
-                  {/* Active dot badge (visible when sidebar is collapsed) */}
                   {isGameRouteActive && (
                     <span className={`absolute right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500 ${isOpen ? 'md:hidden' : 'md:block'} hidden`} />
                   )}
                 </button>
-
-                {/* ── Fix #2: CSS Grid animation instead of hardcoded pixels ── */}
                 <div
                   id={GAMES_DROPDOWN_ID}
                   role="region"
                   className="grid transition-all duration-300 ease-in-out"
-                  style={{
-                    gridTemplateRows: gamesOpen ? '1fr' : '0fr',
-                    opacity: gamesOpen ? 1 : 0,
-                  }}
+                  style={{ gridTemplateRows: gamesOpen ? '1fr' : '0fr', opacity: gamesOpen ? 1 : 0 }}
                 >
                   <div className="overflow-hidden">
                     <div className="pt-1 pb-1 space-y-0.5">
                       {gameServerItems.map((item) => (
-                        <GameNavItem key={item.href} {...item} />
+                        <GameNavItem key={item.href} {...item} pathname={pathname} isOpen={isOpen} />
                       ))}
                     </div>
                   </div>
@@ -345,41 +295,20 @@ export default function Sidebar() {
           )}
         </nav>
 
-        {/* ── Fix #7: Semantic <footer> ──────────────────────────── */}
         <footer className="p-2 border-t border-slate-200">
-          {/* Professional Links */}
           <div className={`flex flex-col px-3 py-2 mb-1 ${isOpen ? 'md:flex' : 'md:hidden'}`}>
             <h3 className="text-[11px] text-slate-400 uppercase tracking-wider font-medium font-mono mb-3">My Contact</h3>
             <div className="flex items-center gap-4 mb-3">
-              <a
-                href="https://github.com/ttser123"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 hover:text-slate-800 transition-colors"
-                title="GitHub"
-              >
+              <a href="https://github.com/ttser123" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-800 transition-colors" title="GitHub">
                 <FaGithub className="text-[20px]" />
               </a>
-              <a
-                href="https://www.linkedin.com/in/parinya-sawatdee"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 hover:text-indigo-600 transition-colors"
-                title="LinkedIn"
-              >
+              <a href="https://www.linkedin.com/in/parinya-sawatdee" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-indigo-600 transition-colors" title="LinkedIn">
                 <FaLinkedin className="text-[20px]" />
               </a>
-              <a
-                href="https://www.youtube.com/@toeysawatdee"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-400 hover:text-rose-600 transition-colors"
-                title="YouTube"
-              >
+              <a href="https://www.youtube.com/@toeysawatdee" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-rose-600 transition-colors" title="YouTube">
                 <FaYoutube className="text-[20px]" />
               </a>
             </div>
-
             <div className="flex items-center gap-2 text-slate-500">
               <FaEnvelope className="text-[13px] shrink-0" />
               <span className="text-[11px] font-medium font-mono select-all hover:text-slate-800 transition-colors cursor-text">
@@ -387,34 +316,17 @@ export default function Sidebar() {
               </span>
             </div>
           </div>
-
-          <div
-            className="group relative flex items-center gap-3 px-3 py-2.5 mb-1 text-slate-500 cursor-default hover:bg-slate-50 rounded-sm transition-colors"
-            title={!isOpen ? `Profile Views: ${visitorCount}` : undefined}
-          >
+          <div className="group relative flex items-center gap-3 px-3 py-2.5 mb-1 text-slate-500 cursor-default hover:bg-slate-50 rounded-sm transition-colors" title={!isOpen ? `Profile Views: ${visitorCount}` : undefined}>
             <span className="material-symbols-outlined text-lg shrink-0">visibility</span>
-            <span className={`text-xs font-medium font-mono whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>
-              Profile Views: {visitorCount}
-            </span>
+            <span className={`text-xs font-medium font-mono whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>Profile Views: {visitorCount}</span>
           </div>
-
-          {/* ── Fix #6: Skeleton loader instead of null during auth check ── */}
-          {isLoading ? (
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-sm animate-pulse">
-              <div className="w-5 h-5 bg-slate-200 rounded-sm shrink-0" />
-              <div className={`h-4 bg-slate-200 rounded-sm w-20 ${isOpen ? 'md:block' : 'md:hidden'}`} />
-            </div>
-          ) : isAuthenticated ? (
-            <button
-              onClick={handleLogout}
-              title={!isOpen ? "Logout" : undefined}
-              className="group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm text-rose-600 hover:bg-rose-50 transition-colors"
-            >
+          {!isAuthenticated ? (
+            <NavItem href="/login" icon="lock" label="Admin Login" pathname={pathname} isOpen={isOpen} />
+          ) : (
+            <button onClick={handleLogout} title={!isOpen ? "Logout" : undefined} className="group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm text-rose-600 hover:bg-rose-50 transition-colors">
               <span className="material-symbols-outlined text-lg shrink-0">logout</span>
               <span className={`whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>Logout</span>
             </button>
-          ) : (
-            <NavItem href="/login" icon="lock" label="Admin Login" />
           )}
         </footer>
       </aside>

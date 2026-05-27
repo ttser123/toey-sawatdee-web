@@ -53,3 +53,4 @@ crash.log
 *.tfvars
 
 GEMINI.md
+/public/assets

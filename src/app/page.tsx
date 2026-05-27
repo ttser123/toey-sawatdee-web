@@ -1,35 +1,55 @@
-// src/app/page.tsx — Portfolio (SOLID/SoC Refactor - Detailed Layout)
+// src/app/page.tsx — Consolidated Portfolio
 'use client';
 
-import { portfolioData } from '@/lib/portfolio-data';
-import { PortfolioHero } from '@/components/portfolio/PortfolioHero';
-import { SkillSection } from '@/components/portfolio/SkillSection';
-import { ExperienceSection } from '@/components/portfolio/ExperienceSection';
-import { ProjectSection } from '@/components/portfolio/ProjectSection';
-import { ContactSection } from '@/components/portfolio/ContactSection';
+import React, { useState } from 'react';
+import { 
+  PortfolioHero, 
+  ContactSection, 
+  ResumeModal, 
+  type HeroSection, 
+  type ContactChannel 
+} from '@/components/portfolio/PortfolioComponents';
+
+// ── Static Data ──────────────────────────────────────────────────────
+
+const STATIC_HERO: HeroSection = {
+  name: "Parinya Sawatdee",
+  nickname: "Toey",
+  headline: "",
+  availability: "Available for Opportunities",
+  resumeUrl: "/resume"
+};
+
+const STATIC_CONTACTS: ContactChannel[] = [
+  { platform: "GitHub", value: "https://github.com/ttser123" },
+  { platform: "LinkedIn", value: "https://linkedin.com/in/parinya-sawatdee" },
+  { platform: "Email", value: "parinya.zawatdee@gmail.com" }
+];
+
+// ── Page Component ───────────────────────────────────────────────────
 
 export default function Home() {
+  const [isResumeOpen, setIsResumeOpen] = useState(false);
+
+  const openResume = () => setIsResumeOpen(true);
+  const closeResume = () => setIsResumeOpen(false);
+
   return (
-    <div className="space-y-16 pb-12">
-      {/* 1. Hero Section (Immediate Scan) */}
-      <PortfolioHero data={portfolioData.hero} />
+    <div className="flex flex-col min-h-[70vh] justify-center space-y-16 py-12 animate-in fade-in duration-1000">
+      <PortfolioHero 
+        data={STATIC_HERO} 
+        onViewResume={openResume} 
+      />
 
-      {/* 3. Tech Skills Grid (Categorized Arsenal) */}
-      <section className="space-y-6">
-        <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter font-mono flex items-center gap-3">
-          Tech Stack
-        </h3>
-        <SkillSection skills={portfolioData.skills} />
-      </section>
+      <ContactSection 
+        contacts={STATIC_CONTACTS} 
+        onViewResume={openResume}
+      />
 
-      {/* 4. Work Experience (Results-oriented) */}
-      <ExperienceSection experiences={portfolioData.experiences} />
-
-      {/* 5. Featured Projects (The Armory) */}
-      <ProjectSection projects={portfolioData.projects} />
-
-      {/* 7. Secured Contact (Secure Channels) */}
-      <ContactSection contacts={portfolioData.contacts} />
+      <ResumeModal 
+        isOpen={isResumeOpen} 
+        onClose={closeResume} 
+      />
     </div>
   );
 }
