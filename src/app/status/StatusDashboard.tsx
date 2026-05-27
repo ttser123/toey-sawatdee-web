@@ -271,14 +271,6 @@ export default function StatusDashboard() {
 
       {/* Cockpit Footer */}
       <div className="flex justify-between items-center px-1 text-[8px] font-bold text-slate-300 uppercase tracking-[0.3em]">
-        <span>BUILD: {data?.pipeline.commit || '---'}</span>
-        <span className="flex items-center gap-3">
-          <span>SECURE_SHELL: ACTIVE</span>
-          <div className="h-1 w-1 bg-slate-200 rounded-full" />
-          <span>REGION: AP-SOUTHEAST-2</span>
-          <div className="h-1 w-1 bg-slate-200 rounded-full" />
-          <span>ENV: {data?.pipeline.env || '---'}</span>
-        </span>
       </div>
 
       <style jsx global>{`

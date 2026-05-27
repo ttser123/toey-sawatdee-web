@@ -11,7 +11,8 @@ import { FaGithub, FaLinkedin, FaEnvelope, FaYoutube } from 'react-icons/fa';
 
 /** Top-level simple links (no children) */
 const topNav = [
-  { href: '/', icon: 'bar_chart', label: 'Overview' },
+  { href: '/', icon: 'person', label: 'Portfolio' },
+  { href: '/overview', icon: 'bar_chart', label: 'Overview' },
 ];
 
 /** Games Server dropdown — collapsible with zone sub-items */
@@ -36,7 +37,6 @@ const bottomNav = [
 
 const adminNav = [
   { href: '/admin/admin-log', icon: 'dns', label: 'Admin Log' },
-  { href: '/admin/finance', icon: 'account_balance', label: 'Finance[Test]' },
 ];
 
 // ── A11y IDs ─────────────────────────────────────────────────────────
@@ -193,7 +193,7 @@ export default function Sidebar() {
     <>
       {/* ── Fix #7: Semantic <header> for Mobile Topbar ──────────── */}
       <header className="md:hidden flex items-center justify-between bg-white/90 backdrop-blur-sm border-b border-slate-200 h-14 px-4 shrink-0">
-        <span className="font-semibold text-slate-800 text-sm">Toey Sawatdee</span>
+        <span className="font-semibold text-slate-800 text-sm">Portfolio</span>
         <button
           onClick={() => setIsMobileOpen(true)}
           className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-sm"
@@ -226,7 +226,7 @@ export default function Sidebar() {
         {/* Header */}
         <div className="h-14 flex items-center justify-between px-3 border-b border-slate-200">
           {/* Always show title on mobile, check isOpen on desktop */}
-          <span className={`font-semibold text-slate-800 text-sm whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>Toey Sawatdee</span>
+          <span className={`font-semibold text-slate-800 text-sm whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>Portfolio</span>
 
           {/* Mobile close button */}
           <button

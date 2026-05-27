@@ -6,7 +6,9 @@ import Sidebar from '@/components/Sidebar';
 import HudHeader from '@/components/HudHeader';
 
 const getPageTitle = (pathname: string) => {
-    if (pathname === '/') return 'OVERVIEW';
+    if (pathname === '/') return 'PORTFOLIO';
+    if (pathname === '/overview') return 'OVERVIEW';
+    if (pathname === '/tools/my-savings') return 'MYSAVINGS';
     if (pathname === '/admin/finance') return 'FINANCE';
     if (pathname === '/status') return 'SYSTEM STATUS';
     if (pathname === '/release-notes') return 'UPDATE LOGS';
