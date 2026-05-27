@@ -3,11 +3,11 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { CloudFrontClient, CreateInvalidationCommand } from '@aws-sdk/client-cloudfront';
 
 const s3Client = new S3Client({
-    region: process.env.AWS_REGION || 'ap-southeast-1',
+    region: process.env.AWS_REGION || 'ap-southeast-2',
 });
 
 const cfClient = new CloudFrontClient({
-    region: process.env.AWS_REGION || 'ap-southeast-1',
+    region: process.env.AWS_REGION || 'ap-southeast-2',
 });
 
 const BUCKET_NAME = 'toey-sawatdee-assets-prod';
