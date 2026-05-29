@@ -35,13 +35,13 @@ export default function ToolsDirectory() {
 
                     <Link 
                         href="/tools/env-tracker"
-                        className="group bg-white border border-slate-200 p-6 rounded-sm hover:border-amber-300 hover:shadow-md transition-all flex flex-col gap-4"
+                        className="group bg-white border border-slate-200 p-6 rounded-sm hover:border-indigo-300 hover:shadow-md transition-all flex flex-col gap-4"
                     >
-                        <div className="w-10 h-10 bg-slate-50 rounded-sm flex items-center justify-center border border-slate-100 group-hover:bg-amber-50 group-hover:border-amber-100 transition-colors">
-                            <span className="material-symbols-outlined text-slate-400 group-hover:text-amber-600">hub</span>
+                        <div className="w-10 h-10 bg-slate-50 rounded-sm flex items-center justify-center border border-slate-100 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
+                            <span className="material-symbols-outlined text-slate-400 group-hover:text-indigo-500">hub</span>
                         </div>
                         <div>
-                            <h3 className="text-slate-900 font-black font-mono uppercase tracking-tight text-sm mb-1 group-hover:text-amber-700 transition-colors">Env Tracker</h3>
+                            <h3 className="text-slate-900 font-black font-mono uppercase tracking-tight text-sm mb-1 group-hover:text-indigo-600 transition-colors">Env Tracker</h3>
                             <p className="text-slate-400 text-[10px] leading-relaxed font-medium uppercase tracking-wider">Blast radius simulator. Uses AST parsing to map environment variable dependencies across the codebase.</p>
                         </div>
                         <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">

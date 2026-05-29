@@ -436,8 +436,7 @@ export default function BlastRadiusGraph() {
           </div>
         )}
 
-      </div>
-      
+      </div>      
       <SecurityShield />
     </div>
     
