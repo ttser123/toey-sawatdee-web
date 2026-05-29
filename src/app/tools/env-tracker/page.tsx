@@ -21,10 +21,10 @@ const BlastRadiusGraphClientOnly = dynamic(
 
 export default function EnvTrackerPage() {
   return (
-    <div className="grid grid-cols-1 gap-8">
+    <div className="grid grid-cols-1 gap-4 lg:gap-8">
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] font-mono">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <h3 className="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] sm:tracking-[0.3em] font-mono">
             [ Mission Control: Dependency Mapping ]
           </h3>
           <div className="flex items-center gap-4 text-[10px] font-mono text-slate-400">
@@ -39,7 +39,7 @@ export default function EnvTrackerPage() {
           </div>
         </div>
         
-        {/* RENDER_CHASSIS: CLIENT_ONLY */}
+        {/* RENDER CHASSIS: CLIENT ONLY */}
         <BlastRadiusGraphClientOnly />
       </section>
     </div>

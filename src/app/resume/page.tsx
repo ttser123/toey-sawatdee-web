@@ -17,12 +17,19 @@ export default function ResumeViewerPage() {
   const [pageNumber, setPageNumber] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastModified, setLastModified] = useState<string | null>(null);
 
   useEffect(() => {
     // Configure pdfjs worker only on client-side
     import('react-pdf').then(({ pdfjs }) => {
       pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
     });
+
+    // Fetch resume last-modified timestamp from the status API
+    fetch('/api/admin/resume/status')
+      .then(res => { if (res.ok) return res.json(); throw new Error('STATUS_UNAVAILABLE'); })
+      .then(data => { if (data.lastModified) setLastModified(data.lastModified); })
+      .catch(() => { /* Status unavailable — field will remain hidden */ });
   }, []);
 
   function onDocumentLoadSuccess({ numPages: totalPages }: { numPages: number }) {
@@ -44,18 +51,28 @@ export default function ResumeViewerPage() {
     <div className="space-y-8 pb-20">
       {/* ── Control Header ─────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 card-blueprint p-4 bg-white/80 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className={`w-2 h-2 rounded-full animate-pulse ${error ? 'bg-rose-500' : 'bg-indigo-500'}`} />
-          <h2 className="text-sm font-black text-slate-800 uppercase font-mono tracking-widest">
-            {error ? 'System_Error: File_Access_Denied' : 'Document_Viewer: Resume_Alpha_v2.pdf'}
-          </h2>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <div className={`w-2 h-2 rounded-full animate-pulse ${error ? 'bg-rose-500' : 'bg-indigo-500'}`} />
+            <h2 className="text-sm font-black text-slate-800 uppercase font-mono tracking-widest">
+              {error ? 'System Error: File Access Denied' : 'Document Viewer: Resume'}
+            </h2>
+          </div>
+          {lastModified && !error && (
+            <div className="flex items-center gap-2 ml-5">
+              <span className="material-symbols-outlined text-[12px] text-slate-400">update</span>
+              <span className="text-[10px] font-mono font-semibold text-slate-500 uppercase tracking-wider">
+                Last Updated: {lastModified}
+              </span>
+            </div>
+          )}
         </div>
         
         <div className="flex items-center gap-3">
           <a 
             href={RESUME_URL} 
             download="Parinya_Sawatdee_Resume.pdf"
-            className={`flex items-center gap-2 px-4 py-2 transition-all font-mono text-[10px] font-black uppercase tracking-widest shadow-tactical ${
+            className={`flex items-center gap-2 px-4 py-2 transition-all font-mono text-[10px] font-black uppercase tracking-widest ${
               error 
                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200 shadow-none' 
                 : 'bg-slate-900 text-white hover:bg-indigo-600'
@@ -63,7 +80,7 @@ export default function ResumeViewerPage() {
             onClick={(e) => error && e.preventDefault()}
           >
             <span className="material-symbols-outlined text-sm">download</span>
-            DOWNLOAD_OFFLINE_COPY
+            DOWNLOAD OFFLINE COPY
           </a>
         </div>
       </div>
@@ -76,7 +93,7 @@ export default function ResumeViewerPage() {
               <div className="w-1/2 h-full bg-indigo-500 animate-[loading-bar_1.5s_infinite_ease-in-out]" />
             </div>
             <p className="text-[10px] font-black font-mono text-slate-400 uppercase tracking-[0.3em]">
-              Synchronizing_Buffers...
+              Synchronizing Buffers...
             </p>
           </div>
         )}
@@ -114,7 +131,7 @@ export default function ResumeViewerPage() {
 
         {/* Blueprint Watermark */}
         <div className="absolute bottom-4 right-4 opacity-10 pointer-events-none select-none">
-          <p className="text-[40px] font-black font-mono text-slate-900 leading-none">ALPHA_SYS</p>
+          <p className="text-[40px] font-black font-mono text-slate-900 leading-none">ALPHA SYS</p>
           <p className="text-[10px] font-black font-mono text-slate-900 text-right uppercase tracking-[0.5em]">Restricted Access</p>
         </div>
       </div>

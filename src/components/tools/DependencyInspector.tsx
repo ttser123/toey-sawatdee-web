@@ -9,7 +9,7 @@ export default function DependencyInspector() {
 
   if (!selectedNodeData) {
     return (
-      <div className="w-80 h-full bg-slate-50 border-l border-slate-300 p-6 flex flex-col items-center justify-center text-slate-400 font-mono text-[10px] uppercase text-center leading-relaxed">
+      <div className="w-full lg:w-80 shrink-0 h-full bg-slate-50 p-6 flex flex-col items-center justify-center text-slate-400 font-mono text-[10px] uppercase text-center leading-relaxed min-h-[200px] lg:min-h-0">
         <div className="mb-4 opacity-20">
           <span className="material-symbols-outlined text-4xl">search_off</span>
         </div>
@@ -20,7 +20,7 @@ export default function DependencyInspector() {
   }
 
   return (
-    <div className="w-80 h-full bg-white border-l border-slate-300 flex flex-col font-mono text-sm overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300">
+    <div className="w-full lg:w-80 shrink-0 h-full bg-white flex flex-col font-mono text-sm overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300">
       {/* HEADER */}
       <div className="p-4 border-b border-slate-300 bg-slate-50">
         <div className="flex justify-between items-start mb-2">

@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 import { EnvNodeData } from "@/lib/env-tracker-types";
 import path from "path";
 
-// 🛠️ CONFIG: Enterprise-grade speed optimization to prevent Node.js Event Loop blocking
+// Force dynamic to prevent build-time pre-rendering of server-side AST scan
+export const dynamic = 'force-dynamic';
+
+// CONFIG: Enterprise-grade speed optimization to prevent Node.js Event Loop blocking
 const AST_SPEED_CONFIG = {
   skipLoadingLibFiles: true, // Crucial: skip loading massive ts standard libs
   skipAddingFilesFromTsConfig: true,
@@ -13,13 +16,13 @@ const AST_SPEED_CONFIG = {
   }
 };
 
-// 🛠️ THE MASTERPIECE CACHE: Global In-Memory Cache to prevent redundant synchronous AST parsing
+// THE MASTERPIECE CACHE: Global In-Memory Cache to prevent redundant synchronous AST parsing
 let GLOBAL_WORKSPACE_ENV_CACHE: EnvNodeData[] | null = null;
 
-// 🌟 GET: Isomorphic Hydration (Server scans itself for default telemetry)
+// GET: Isomorphic Hydration (Server scans demo-workspace for default telemetry)
 export async function GET() {
   try {
-    // 1. 🔥 FAST PATH: Return cached payload instantly if available (0ms Event Loop block)
+    // FAST PATH: Return cached payload instantly if available (0ms Event Loop block)
     if (GLOBAL_WORKSPACE_ENV_CACHE !== null) {
       console.log("=> [Server Cache] HIT: SERVING_WORKSPACE_TELEMETRY_INSTANTLY");
       return NextResponse.json(GLOBAL_WORKSPACE_ENV_CACHE);
@@ -27,15 +30,13 @@ export async function GET() {
 
     console.log("=> [Server Cache] MISS: INITIALIZING_FIRST_TIME_AST_SCAN");
 
-    // 🛠️ HIGH-PERFORMANCE INSTANTIATION
+    // HIGH-PERFORMANCE INSTANTIATION
     const project = new Project(AST_SPEED_CONFIG);
     const envMap = new Map<string, EnvNodeData>();
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    // Match the exact scope of the client-side upload: scan root level for .ts, .tsx, .js
-    const targetPath = isProduction 
-      ? path.join(process.cwd(), 'demo-workspace/**/*.{ts,tsx,js}')
-      : path.join(process.cwd(), '**/*.{ts,tsx,js}');
+    // Always scan demo-workspace in both dev and production
+    // The demo-workspace contains curated sample files for the visualization
+    const targetPath = path.join(process.cwd(), 'demo-workspace', '**/*.{ts,tsx,js}');
 
     project.addSourceFilesAtPaths(targetPath);
 

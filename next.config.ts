@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   },
   outputFileTracingIncludes: {
     '/api/scan': ['./demo-workspace/**/*'],
+    '/api/scan-upload': ['./demo-workspace/**/*'],
   },
   async headers() {
     return [

@@ -106,7 +106,8 @@ export default function BlastRadiusGraph() {
     };
   }, [setSelectedNode]);
 
-  // 🛠️ ISOMORPHIC HYDRATION: Fetch the server's own telemetry on mount
+  // ISOMORPHIC HYDRATION: Fetch the server's own telemetry on mount
+  // Falls back to embedded snapshot data if the server-side AST scan fails
   useEffect(() => {
     async function loadDefaultTelemetry() {
       try {
@@ -115,13 +116,22 @@ export default function BlastRadiusGraph() {
         if (!res.ok) throw new Error(`INITIAL DIAGNOSTIC FAILURE [HTTP ${res.status}]`);
         
         const data = await res.json();
+
+        // Guard: If the API returns an error object instead of an array,
+        // fall back to the embedded snapshot
+        if (!Array.isArray(data)) {
+          throw new Error('INVALID_PAYLOAD_STRUCTURE');
+        }
+
         if (isMountedRef.current) {
           setRawData(data);
         }
       } catch (err: any) {
         if (isMountedRef.current) {
-          console.error("Failed to load default server telemetry:", err);
-          setApiError(err.message || "UNKNOWN INITIALIZATION ERROR");
+          console.warn("Server telemetry unavailable, using embedded snapshot:", err.message);
+          // FALLBACK: Use the pre-bundled snapshot data instead of showing an error
+          setRawData(defaultEnvSnapshot as EnvNodeData[]);
+          setApiError(null); // Clear any error — snapshot is valid data
         }
       } finally {
         if (isMountedRef.current) {
@@ -322,36 +332,36 @@ export default function BlastRadiusGraph() {
     }
   }, [setSelectedNode]);
 
-  // 🛠️ Tactical Loading State
+  // Tactical Loading State
   if (isLoading) {
     return (
       <div 
-        className="w-full border-2 border-slate-900 rounded-none bg-slate-50 flex flex-col items-center justify-center font-mono text-slate-900 gap-4"
-        style={{ height: '800px' }}
+        className="w-full border-2 border-slate-900 rounded-none bg-slate-50 flex flex-col items-center justify-center font-mono text-slate-900 gap-4 px-4"
+        style={{ height: '500px' }}
       >
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 bg-slate-900 rounded-full animate-radar-ping" />
-          <span className="text-xs font-black uppercase tracking-[0.2em] animate-pulse">
+          <span className="text-[10px] lg:text-xs font-black uppercase tracking-[0.2em] animate-pulse text-center">
             TRANSMITTING PAYLOAD TO IN-MEMORY AST ENGINE...
           </span>
         </div>
-        <div className="text-[9px] text-slate-400 uppercase tracking-widest">
+        <div className="text-[9px] text-slate-400 uppercase tracking-widest text-center">
           SECURITY PROTOCOL: ZERO DISK I/O ACTIVE
         </div>
       </div>
     );
   }
 
-  // 🛠️ Tactical Error State
+  // Tactical Error State
   if (apiError) {
     return (
       <div 
-        className="w-full border-2 border-red-500 rounded-none bg-red-50 flex flex-col items-center justify-center font-mono text-red-600 p-8 text-center"
-        style={{ height: '800px' }}
+        className="w-full border-2 border-rose-400 rounded-none bg-rose-50 flex flex-col items-center justify-center font-mono text-rose-600 p-8 text-center"
+        style={{ height: '500px' }}
       >
         <span className="material-symbols-outlined text-4xl mb-4">emergency_home</span>
         <span className="text-sm font-black uppercase tracking-widest mb-2">CRITICAL: ENGINE FAILURE</span>
-        <div className="bg-white border border-red-200 p-4 text-[10px] text-red-500 uppercase leading-relaxed max-w-md shadow-sm">
+        <div className="bg-white border border-rose-200 p-4 text-[10px] text-rose-500 uppercase leading-relaxed max-w-md">
           CODE: {apiError}
           <br />
           <span className="text-slate-400 mt-2 block italic text-[9px]">
@@ -360,9 +370,9 @@ export default function BlastRadiusGraph() {
         </div>
         <button 
           onClick={() => setApiError(null)}
-          className="mt-6 px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-colors shadow-[4px_4px_0px_0px_rgba(220,38,38,0.2)]"
+          className="mt-6 px-4 py-2 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-colors rounded-sm"
         >
-          ACKNOWLEDGE & RETRY
+          ACKNOWLEDGE AND RETRY
         </button>
       </div>
     );
@@ -371,40 +381,43 @@ export default function BlastRadiusGraph() {
   return (
     <div className="flex flex-col w-full border-2 border-slate-900 rounded-none relative bg-white shadow-sm">
       
-      {/* 📁 NO-CODE DROPZONE HEADER */}
-      <div className="p-4 lg:p-6 border-b-2 border-slate-900 bg-slate-50 shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex flex-col">
-          <span className="font-mono font-black text-[11px] lg:text-xs text-slate-800 uppercase tracking-widest">
-            {rawData.length > 0 ? 'Diagnostic Complete' : 'Awaiting Input Payload'}
-          </span>
-          <span className="font-mono text-[9px] lg:text-[10px] text-slate-500 uppercase tracking-wider mt-1">
-            {rawData.length > 0 
-              ? `Detected ${rawData.length} Environment Variables` 
-              : 'Drag & Drop or Select a Repository Folder to Analyze'}
-          </span>
-        </div>
+      <div className="p-4 lg:p-6 border-b-2 border-slate-900 bg-slate-50 shrink-0 flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="font-mono font-black text-[11px] lg:text-xs text-slate-800 uppercase tracking-widest">
+              {rawData.length > 0 ? 'Diagnostic Complete' : 'Awaiting Input Payload'}
+            </span>
+            <span className="font-mono text-[9px] lg:text-[10px] text-slate-500 uppercase tracking-wider mt-1">
+              {rawData.length > 0 
+                ? `Detected ${rawData.length} Environment Variables` 
+                : 'Drag and Drop or Select a Repository Folder to Analyze'}
+            </span>
+          </div>
 
-        <label className="cursor-pointer w-full sm:w-auto text-center group bg-indigo-600 hover:bg-indigo-700 text-white font-mono px-6 py-3 rounded-none text-[10px] lg:text-xs font-black uppercase tracking-widest transition-all shadow-[4px_4px_0px_0px_rgba(79,70,229,0.2)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 flex items-center justify-center gap-2 shrink-0">
-          <span className="material-symbols-outlined text-sm lg:text-base">folder_open</span>
-          <span>{rawData.length > 0 ? 'SCAN ANOTHER FOLDER' : 'SELECT FOLDER'}</span>
-          <input 
-            type="file" 
-            className="hidden" 
-            // @ts-ignore
-            webkitdirectory="true" 
-            directory="true" 
-            multiple 
-            onChange={handleFolderUpload} 
-            disabled={isLoading}
-          />
-        </label>
+          <label className="cursor-pointer w-full sm:w-auto text-center group bg-indigo-600 hover:bg-indigo-700 text-white font-mono px-5 py-3 lg:px-6 rounded-none text-[10px] lg:text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shrink-0">
+            <span className="material-symbols-outlined text-sm lg:text-base">folder_open</span>
+            <span>{rawData.length > 0 ? 'SCAN ANOTHER FOLDER' : 'SELECT FOLDER'}</span>
+            <input 
+              type="file" 
+              className="hidden" 
+              // @ts-ignore
+              webkitdirectory="true" 
+              directory="true" 
+              multiple 
+              onChange={handleFolderUpload} 
+              disabled={isLoading}
+            />
+          </label>
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row w-full relative overflow-hidden items-stretch bg-dot-pattern">
         
-        {/* GRAPH OR EMPTY STATE */}
-        {/* Mobile: 500px height, Desktop: 800px height */}
-        <div className="w-full lg:flex-1 relative min-h-[500px] lg:min-h-[800px]">
+        <div className="w-full lg:flex-1 relative" style={{ minHeight: '400px' }}>
+          {/* Mobile hint: ReactFlow requires touch gestures */}
+          <div className="absolute top-2 left-2 z-10 lg:hidden bg-white/90 border border-slate-200 px-2 py-1 rounded-sm">
+            <span className="text-[8px] font-mono text-slate-400 uppercase tracking-wider">Pinch to zoom / Drag to pan</span>
+          </div>
           {rawData.length === 0 ? (
              <div className="absolute inset-0 flex flex-col items-center justify-center">
                <span className="material-symbols-outlined text-4xl lg:text-6xl text-slate-200 mb-4">account_tree</span>
@@ -431,7 +444,7 @@ export default function BlastRadiusGraph() {
         {/* INSPECTOR PANEL */}
         {/* Mobile: Full width below graph, Desktop: Fixed 320px width locking to the right */}
         {rawData.length > 0 && (
-          <div className="w-full lg:w-80 border-t-2 lg:border-t-0 lg:border-l-2 border-slate-900 bg-white">
+          <div className="w-full lg:w-80 border-t-2 lg:border-t-0 lg:border-l-2 border-slate-900 bg-white max-h-[400px] lg:max-h-none overflow-y-auto">
             <DependencyInspector />
           </div>
         )}
