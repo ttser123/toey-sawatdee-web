@@ -82,6 +82,7 @@ export default function BlastRadiusGraph() {
   const [rawData, setRawData] = useState<EnvNodeData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true); // Start in loading state
   const [apiError, setApiError] = useState<string | null>(null);
+  const [isCustomScan, setIsCustomScan] = useState<boolean>(false);
   
   const setSelectedNode = useInspectorStore((state) => state.setSelectedNode);
 
@@ -148,6 +149,7 @@ export default function BlastRadiusGraph() {
     if (!files || files.length === 0) return;
 
     setIsLoading(true);
+    setIsCustomScan(true);
     setApiError(null);
     setSelectedNode(null);
 
@@ -385,29 +387,40 @@ export default function BlastRadiusGraph() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex flex-col">
             <span className="font-mono font-black text-[11px] lg:text-xs text-slate-800 uppercase tracking-widest">
-              {rawData.length > 0 ? 'Diagnostic Complete' : 'Awaiting Input Payload'}
+              {isCustomScan ? 'Custom Telemetry Live Scan' : 'Live Portfolio Architecture Scope'}
             </span>
             <span className="font-mono text-[9px] lg:text-[10px] text-slate-500 uppercase tracking-wider mt-1">
-              {rawData.length > 0 
-                ? `Detected ${rawData.length} Environment Variables` 
-                : 'Drag and Drop or Select a Repository Folder to Analyze'}
+              {isLoading 
+                ? 'Processing local stream via Web Worker...' 
+                : isCustomScan 
+                  ? `Detected ${rawData.length} Environment Variables (Live Custom Scan)` 
+                  : `Detected ${rawData.length} Environment Variables (0ms Cached Render)`}
             </span>
           </div>
 
-          <label className="cursor-pointer w-full sm:w-auto text-center group bg-indigo-600 hover:bg-indigo-700 text-white font-mono px-5 py-3 lg:px-6 rounded-none text-[10px] lg:text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shrink-0">
-            <span className="material-symbols-outlined text-sm lg:text-base">folder_open</span>
-            <span>{rawData.length > 0 ? 'SCAN ANOTHER FOLDER' : 'SELECT FOLDER'}</span>
-            <input 
-              type="file" 
-              className="hidden" 
-              // @ts-ignore
-              webkitdirectory="true" 
-              directory="true" 
-              multiple 
-              onChange={handleFolderUpload} 
-              disabled={isLoading}
-            />
-          </label>
+          <div className="flex flex-col items-end gap-1.5 w-full sm:w-auto shrink-0">
+            <label className="cursor-pointer w-full sm:w-auto text-center group bg-indigo-600 hover:bg-indigo-700 text-white font-mono px-5 py-3 lg:px-6 rounded-none text-[10px] lg:text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+              <span className="material-symbols-outlined text-sm lg:text-base">folder_open</span>
+              <span>{isCustomScan ? 'SCAN ANOTHER FOLDER' : 'RUN LIVE IN-MEMORY TEST'}</span>
+              <input 
+                type="file" 
+                className="hidden" 
+                // @ts-ignore
+                webkitdirectory="true" 
+                directory="true" 
+                multiple 
+                onChange={handleFolderUpload} 
+                disabled={isLoading}
+              />
+            </label>
+            <span className="text-[8px] lg:text-[9px] text-slate-400 font-mono uppercase tracking-widest text-right">
+              {isLoading 
+                ? 'Streaming local directories via Web Worker thread' 
+                : isCustomScan 
+                  ? 'Real-time client-side AST processing complete' 
+                  : 'Zero Disk I/O static pre-compiled snapshot loaded'}
+            </span>
+          </div>
         </div>
       </div>
 

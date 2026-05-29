@@ -1,11 +1,220 @@
 [
   {
-    "id": "env-NEXT_PUBLIC_COGNITO_CLIENT_ID",
-    "keyName": "NEXT_PUBLIC_COGNITO_CLIENT_ID",
+    "id": "env-DATABASE_URL",
+    "keyName": "DATABASE_URL",
+    "totalUsages": 1,
+    "dependencies": [
+      {
+        "filePath": "demo-workspace/core/database.ts",
+        "lineNumber": 3,
+        "codeSnippet": "const dbUrl = process.env.DATABASE_URL;"
+      }
+    ]
+  },
+  {
+    "id": "env-DB_USER",
+    "keyName": "DB_USER",
+    "totalUsages": 1,
+    "dependencies": [
+      {
+        "filePath": "demo-workspace/core/database.ts",
+        "lineNumber": 4,
+        "codeSnippet": "const dbUser = process.env.DB_USER;"
+      }
+    ]
+  },
+  {
+    "id": "env-DB_PASSWORD",
+    "keyName": "DB_PASSWORD",
+    "totalUsages": 1,
+    "dependencies": [
+      {
+        "filePath": "demo-workspace/core/database.ts",
+        "lineNumber": 5,
+        "codeSnippet": "const dbPass = process.env.DB_PASSWORD;"
+      }
+    ]
+  },
+  {
+    "id": "env-STRIPE_SECRET_KEY",
+    "keyName": "STRIPE_SECRET_KEY",
+    "totalUsages": 4,
+    "dependencies": [
+      {
+        "filePath": "demo-workspace/services/stripe-client.ts",
+        "lineNumber": 3,
+        "codeSnippet": "const apiKey = process.env.STRIPE_SECRET_KEY;"
+      },
+      {
+        "filePath": "src/lib/stripe.ts",
+        "lineNumber": 5,
+        "codeSnippet": "const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);"
+      },
+      {
+        "filePath": "src/app/api/checkout/route.ts",
+        "lineNumber": 22,
+        "codeSnippet": "if (!process.env.STRIPE_SECRET_KEY) throw new Error();"
+      },
+      {
+        "filePath": "src/app/api/webhooks/stripe/route.ts",
+        "lineNumber": 15,
+        "codeSnippet": "const key = process.env.STRIPE_SECRET_KEY;"
+      }
+    ]
+  },
+  {
+    "id": "env-STRIPE_WEBHOOK_SECRET",
+    "keyName": "STRIPE_WEBHOOK_SECRET",
+    "totalUsages": 1,
+    "dependencies": [
+      {
+        "filePath": "demo-workspace/services/stripe-client.ts",
+        "lineNumber": 4,
+        "codeSnippet": "const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;"
+      }
+    ]
+  },
+  {
+    "id": "env-NEXT_PUBLIC_AUTH0_CLIENT_ID",
+    "keyName": "NEXT_PUBLIC_AUTH0_CLIENT_ID",
+    "totalUsages": 1,
+    "dependencies": [
+      {
+        "filePath": "demo-workspace/ui/AuthButton.tsx",
+        "lineNumber": 3,
+        "codeSnippet": "const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID;"
+      }
+    ]
+  },
+  {
+    "id": "env-NEXT_PUBLIC_AUTH0_DOMAIN",
+    "keyName": "NEXT_PUBLIC_AUTH0_DOMAIN",
+    "totalUsages": 1,
+    "dependencies": [
+      {
+        "filePath": "demo-workspace/ui/AuthButton.tsx",
+        "lineNumber": 4,
+        "codeSnippet": "const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN;"
+      }
+    ]
+  },
+  {
+    "id": "env-NEXT_PUBLIC_API_URL",
+    "keyName": "NEXT_PUBLIC_API_URL",
+    "totalUsages": 1,
+    "dependencies": [
+      {
+        "filePath": "src/components/Sidebar.tsx",
+        "lineNumber": 126,
+        "codeSnippet": "const apiUrl = process.env.NEXT_PUBLIC_API_URL;"
+      }
+    ]
+  },
+  {
+    "id": "env-NEXT_PUBLIC_COGNITO_USER_POOL_ID",
+    "keyName": "NEXT_PUBLIC_COGNITO_USER_POOL_ID",
     "totalUsages": 2,
     "dependencies": [
-      { "filePath": "src/lib/auth-client.ts", "lineNumber": 12, "codeSnippet": "const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;" },
-      { "filePath": "src/components/AuthButton.tsx", "lineNumber": 45, "codeSnippet": "console.log(process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID);" }
+      {
+        "filePath": "src/lib/amplify-config.ts",
+        "lineNumber": 6,
+        "codeSnippet": "userPoolId: process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID || '',"
+      },
+      {
+        "filePath": "src/app/api/status/health/route.ts",
+        "lineNumber": 82,
+        "codeSnippet": "const cognitoPoolId = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID;"
+      }
+    ]
+  },
+  {
+    "id": "env-NEXT_PUBLIC_COGNITO_CLIENT_ID",
+    "keyName": "NEXT_PUBLIC_COGNITO_CLIENT_ID",
+    "totalUsages": 3,
+    "dependencies": [
+      {
+        "filePath": "src/lib/amplify-config.ts",
+        "lineNumber": 7,
+        "codeSnippet": "userPoolClientId: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID || '',"
+      },
+      {
+        "filePath": "src/lib/auth-client.ts",
+        "lineNumber": 12,
+        "codeSnippet": "const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;"
+      },
+      {
+        "filePath": "src/components/AuthButton.tsx",
+        "lineNumber": 45,
+        "codeSnippet": "console.log(process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID);"
+      }
+    ]
+  },
+  {
+    "id": "env-NODE_ENV",
+    "keyName": "NODE_ENV",
+    "totalUsages": 3,
+    "dependencies": [
+      {
+        "filePath": "src/app/api/scan/route.ts",
+        "lineNumber": 9,
+        "codeSnippet": "const isProduction = process.env.NODE_ENV === 'production';"
+      },
+      {
+        "filePath": "src/app/api/version/route.ts",
+        "lineNumber": 7,
+        "codeSnippet": "node_env: process.env.NODE_ENV,"
+      },
+      {
+        "filePath": "src/app/api/status/health/route.ts",
+        "lineNumber": 140,
+        "codeSnippet": "env: process.env.NODE_ENV || 'development',"
+      }
+    ]
+  },
+  {
+    "id": "env-GITHUB_SHA",
+    "keyName": "GITHUB_SHA",
+    "totalUsages": 2,
+    "dependencies": [
+      {
+        "filePath": "src/app/api/version/route.ts",
+        "lineNumber": 5,
+        "codeSnippet": "version: process.env.GITHUB_SHA || 'dev-local',"
+      },
+      {
+        "filePath": "src/app/api/status/health/route.ts",
+        "lineNumber": 139,
+        "codeSnippet": "commit: process.env.GITHUB_SHA?.substring(0, 7) || 'dev-local',"
+      }
+    ]
+  },
+  {
+    "id": "env-AWS_REGION",
+    "keyName": "AWS_REGION",
+    "totalUsages": 2,
+    "dependencies": [
+      {
+        "filePath": "src/app/api/admin/resume/route.ts",
+        "lineNumber": 6,
+        "codeSnippet": "region: process.env.AWS_REGION || 'ap-southeast-2',"
+      },
+      {
+        "filePath": "src/app/api/admin/resume/route.ts",
+        "lineNumber": 10,
+        "codeSnippet": "region: process.env.AWS_REGION || 'ap-southeast-2',"
+      }
+    ]
+  },
+  {
+    "id": "env-CLOUDFRONT_DISTRIBUTION_ID",
+    "keyName": "CLOUDFRONT_DISTRIBUTION_ID",
+    "totalUsages": 1,
+    "dependencies": [
+      {
+        "filePath": "src/app/api/admin/resume/route.ts",
+        "lineNumber": 14,
+        "codeSnippet": "const DISTRIBUTION_ID = process.env.CLOUDFRONT_DISTRIBUTION_ID;"
+      }
     ]
   },
   {
@@ -13,17 +222,11 @@
     "keyName": "DYNAMODB_TABLE_NAME",
     "totalUsages": 1,
     "dependencies": [
-      { "filePath": "src/app/api/status/route.ts", "lineNumber": 89, "codeSnippet": "const tableName = process.env.DYNAMODB_TABLE_NAME || 'Default';" }
-    ]
-  },
-  {
-    "id": "env-STRIPE_SECRET_KEY",
-    "keyName": "STRIPE_SECRET_KEY",
-    "totalUsages": 3,
-    "dependencies": [
-      { "filePath": "src/lib/stripe.ts", "lineNumber": 5, "codeSnippet": "const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);" },
-      { "filePath": "src/app/api/checkout/route.ts", "lineNumber": 22, "codeSnippet": "if (!process.env.STRIPE_SECRET_KEY) throw new Error();" },
-      { "filePath": "src/app/api/webhooks/stripe/route.ts", "lineNumber": 15, "codeSnippet": "const key = process.env.STRIPE_SECRET_KEY;" }
+      {
+        "filePath": "src/app/api/status/route.ts",
+        "lineNumber": 89,
+        "codeSnippet": "const tableName = process.env.DYNAMODB_TABLE_NAME || 'Default';"
+      }
     ]
   }
 ]
