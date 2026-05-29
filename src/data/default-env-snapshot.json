@@ -1,0 +1,29 @@
+[
+  {
+    "id": "env-NEXT_PUBLIC_COGNITO_CLIENT_ID",
+    "keyName": "NEXT_PUBLIC_COGNITO_CLIENT_ID",
+    "totalUsages": 2,
+    "dependencies": [
+      { "filePath": "src/lib/auth-client.ts", "lineNumber": 12, "codeSnippet": "const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;" },
+      { "filePath": "src/components/AuthButton.tsx", "lineNumber": 45, "codeSnippet": "console.log(process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID);" }
+    ]
+  },
+  {
+    "id": "env-DYNAMODB_TABLE_NAME",
+    "keyName": "DYNAMODB_TABLE_NAME",
+    "totalUsages": 1,
+    "dependencies": [
+      { "filePath": "src/app/api/status/route.ts", "lineNumber": 89, "codeSnippet": "const tableName = process.env.DYNAMODB_TABLE_NAME || 'Default';" }
+    ]
+  },
+  {
+    "id": "env-STRIPE_SECRET_KEY",
+    "keyName": "STRIPE_SECRET_KEY",
+    "totalUsages": 3,
+    "dependencies": [
+      { "filePath": "src/lib/stripe.ts", "lineNumber": 5, "codeSnippet": "const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);" },
+      { "filePath": "src/app/api/checkout/route.ts", "lineNumber": 22, "codeSnippet": "if (!process.env.STRIPE_SECRET_KEY) throw new Error();" },
+      { "filePath": "src/app/api/webhooks/stripe/route.ts", "lineNumber": 15, "codeSnippet": "const key = process.env.STRIPE_SECRET_KEY;" }
+    ]
+  }
+]

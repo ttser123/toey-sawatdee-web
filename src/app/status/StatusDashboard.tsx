@@ -102,40 +102,54 @@ export default function StatusDashboard() {
   const [isError, setIsError] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const fetchAPM = useCallback(async () => {
-    setIsSyncing(true);
-    const start = Date.now();
-    try {
-      const res = await fetch('/api/status/health', { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP_${res.status}`);
-      const payload: APMData = await res.json();
-      setData(payload);
-      setIsError(false);
-
-      setLogs(prev => [{
-        id: Math.random().toString(36).substring(7),
-        time: new Date().toLocaleTimeString('en-GB', { hour12: false }),
-        msg: `HEARTBEAT_ACK: ${Date.now() - start}ms`,
-        status: 'OK',
-      } as LogEntry, ...prev].slice(0, 50));
-    } catch (e) {
-      setIsError(true);
-      setLogs(prev => [{
-        id: Math.random().toString(36).substring(7),
-        time: new Date().toLocaleTimeString('en-GB', { hour12: false }),
-        msg: `SIGNAL_DROPOUT: ${e instanceof Error ? e.message : 'TIMEOUT'}`,
-        status: 'FAIL',
-      } as LogEntry, ...prev].slice(0, 50));
-    } finally {
-      setIsSyncing(false);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchAPM();
-    const interval = setInterval(fetchAPM, 5000);
-    return () => clearInterval(interval);
-  }, [fetchAPM]);
+    setIsSyncing(true);
+    // 🛠️ TACTICAL ARCHITECTURE: Open a persistent SSE pipeline to the backend
+    const eventSource = new EventSource('/api/status/stream');
+
+    eventSource.onmessage = (event) => {
+      try {
+        const payload: APMData = JSON.parse(event.data);
+        setData(payload);
+        setIsError(false);
+        setIsSyncing(false);
+
+        // High-precision ID generation to prevent collisions
+        const uniqueId = `ACK_${performance.now().toFixed(0)}_${Math.random().toString(36).substring(2, 7)}`;
+        
+        setLogs((prev) => [
+          {
+            id: uniqueId,
+            time: new Date().toLocaleTimeString('en-GB', { hour12: false }),
+            msg: `STREAM_PACKET_RECEIVED: SYNC_OK`,
+            status: 'OK'
+          } as LogEntry,
+          ...prev
+        ].slice(0, 30)); // Cap at 30 to prevent UI memory bloat on mobile
+      } catch (err) {
+        console.error("Failed to parse SSE payload", err);
+      }
+    };
+
+    eventSource.onerror = () => {
+      setIsError(true);
+      setIsSyncing(false);
+      setLogs((prev) => [
+        {
+          id: `ERR_${Date.now()}`,
+          time: new Date().toLocaleTimeString('en-GB', { hour12: false }),
+          msg: `STREAM_SIGNAL_DROPOUT: ATTEMPTING_RECONNECT`,
+          status: 'FAIL'
+        } as LogEntry,
+        ...prev
+      ].slice(0, 30));
+    };
+
+    // 🛠️ Cleanup: Terminate the connection when the user navigates away
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   const formatUptime = (s: number) => {
     const d = Math.floor(s / 86400);

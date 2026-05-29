@@ -57,10 +57,20 @@ export function ResumeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const [numPages, setNumPages] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      
+      // Fetch file status (Last Modified) from the system
+      fetch('/api/admin/resume/status')
+        .then(res => res.json())
+        .then(data => {
+          if (data.lastModified) setLastUpdated(data.lastModified);
+        })
+        .catch(err => console.error('Failed to fetch resume status:', err));
+
       import('react-pdf').then(({ pdfjs }) => {
         pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
       });
@@ -79,14 +89,21 @@ export function ResumeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-2 md:p-8 animate-in fade-in duration-300" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-2 md:p-8 animate-in fade-in duration-300" onClick={onClose}>
       <div className="w-full max-w-5xl h-[95vh] md:h-full flex flex-col bg-white border border-slate-700 shadow-2xl relative animate-in zoom-in-95 duration-300 overflow-hidden" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-50 shrink-0">
           <div className="flex items-center gap-3">
             <div className={`w-2 h-2 rounded-full animate-pulse ${error ? 'bg-rose-500' : 'bg-indigo-500'}`} />
-            <h2 className="text-xs font-black text-slate-800 uppercase font-mono tracking-widest">
-              {error ? 'Error: Access_Failed' : 'Document Viewer: Resume'}
-            </h2>
+            <div className="flex flex-col">
+              <h2 className="text-[20px] font-black text-slate-800 uppercase font-mono tracking-widest leading-none mb-1">
+                {error ? 'Error: Access Failed' : 'Document Viewer: Resume'}
+              </h2>
+              {lastUpdated && !error && (
+                <span className="text-[17px] font-mono text-slate-400 uppercase tracking-tighter">
+                  File Last Modified: {lastUpdated}
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2 md:gap-4">
             <a href={RESUME_FILE_PATH} download="Parinya_Sawatdee_Resume.pdf" className="group flex items-center gap-2 px-3 py-1.5 hover:bg-indigo-600 hover:text-white transition-all text-slate-500 rounded-sm border border-transparent hover:border-indigo-400">

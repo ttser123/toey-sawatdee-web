@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  outputFileTracingIncludes: {
+    '/api/scan': ['./demo-workspace/**/*'],
+  },
   async headers() {
     return [
       {

@@ -1,0 +1,445 @@
+"use client";
+
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import ReactFlow, { 
+  Background, 
+  Controls, 
+  Node, 
+  Edge, 
+  BackgroundVariant,
+  Panel
+} from 'reactflow';
+
+import 'reactflow/dist/style.css';
+
+import { EnvNodeData } from '@/lib/env-tracker-types';
+import { Badge } from '@/components/ui/Badge';
+import { useInspectorStore } from '@/lib/inspector-store';
+import DependencyInspector from './DependencyInspector';
+import { SecurityShield } from './SecurityShield';
+
+// 🔥 ZERO-LATENCY SNAPSHOT: Embed default telemetry directly into the bundle
+import defaultEnvSnapshot from '@/data/default-env-snapshot.json';
+
+// 🛠️ SERVERLESS ARCHITECTURE: Background Web Worker Thread (Streaming Edition)
+const workerScript = `
+  const envMap = new Map();
+  // High-speed regex tokenizer for locating environment variables
+  const regex = /process\\.env\\.([a-zA-Z0-9_]+)|process\\.env\\[['" ]([a-zA-Z0-9_]+)['" ]\\]/g;
+
+  self.onmessage = async function(e) {
+    const { type, data } = e.data;
+
+    // 1. Accumulate and process chunks in the background RAM
+    if (type === 'CHUNK') {
+      for (const item of data) {
+        try {
+          const text = await item.file.text(); // Read securely in RAM
+          if (!text.includes('process.env')) continue; // Silver bullet pre-filter
+
+          const lines = text.split('\\n');
+          lines.forEach((lineContent, lineIdx) => {
+            let match;
+            regex.lastIndex = 0; // Reset regex state
+            
+            while ((match = regex.exec(lineContent)) !== null) {
+              const keyName = match[1] || match[2];
+              const lineNumber = lineIdx + 1;
+              const codeSnippet = lineContent.trim();
+
+              if (!envMap.has(keyName)) {
+                envMap.set(keyName, { 
+                  id: 'env-' + keyName, 
+                  keyName, 
+                  totalUsages: 0, 
+                  dependencies: [] 
+                });
+              }
+              const envData = envMap.get(keyName);
+              envData.totalUsages += 1;
+              envData.dependencies.push({ 
+                filePath: item.relativePath, 
+                lineNumber,
+                codeSnippet
+              });
+            }
+          });
+        } catch (err) {
+          // Silently skip unreadable/binary files
+        }
+      }
+    }
+
+    // 2. Finalize and transmit aggregated contract back to Main Thread
+    if (type === 'END') {
+      self.postMessage(Array.from(envMap.values()));
+      envMap.clear(); // Purge RAM immediately
+    }
+  };
+`;
+
+export default function BlastRadiusGraph() {
+  const [rawData, setRawData] = useState<EnvNodeData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Start in loading state
+  const [apiError, setApiError] = useState<string | null>(null);
+  
+  const setSelectedNode = useInspectorStore((state) => state.setSelectedNode);
+
+  // 🛠️ TACTICAL ARCHITECTURE: Lifecycle Management Refs
+  const isMountedRef = useRef<boolean>(true);
+  const activeWorkerRef = useRef<Worker | null>(null);
+
+  // 🛠️ COMPONENT LIFECYCLE: Hard kill background tasks on unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    
+    return () => {
+      // THE KILLER MOVE: Flip the kill switch instantly on navigation!
+      isMountedRef.current = false; 
+      
+      if (activeWorkerRef.current) {
+        activeWorkerRef.current.terminate(); // Blow up the ghost worker mid-air
+        console.log("=> [Lifecycle] GHOST_WORKER_TERMINATED_SUCCESSFULLY");
+      }
+      
+      setSelectedNode(null); // Purge Inspector state from RAM
+    };
+  }, [setSelectedNode]);
+
+  // 🛠️ ISOMORPHIC HYDRATION: Fetch the server's own telemetry on mount
+  useEffect(() => {
+    async function loadDefaultTelemetry() {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/scan-upload'); 
+        if (!res.ok) throw new Error(`INITIAL DIAGNOSTIC FAILURE [HTTP ${res.status}]`);
+        
+        const data = await res.json();
+        if (isMountedRef.current) {
+          setRawData(data);
+        }
+      } catch (err: any) {
+        if (isMountedRef.current) {
+          console.error("Failed to load default server telemetry:", err);
+          setApiError(err.message || "UNKNOWN INITIALIZATION ERROR");
+        }
+      } finally {
+        if (isMountedRef.current) {
+          setIsLoading(false);
+        }
+      }
+    }
+    loadDefaultTelemetry();
+  }, []);
+
+  // 🛠️ 100% SERVERLESS + NON-BLOCKING: Stream-Chunking Architecture
+  const handleFolderUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsLoading(true);
+    setApiError(null);
+    setSelectedNode(null);
+
+    // Spin up the Streaming Web Worker and register it in the Ref
+    const blob = new Blob([workerScript], { type: 'application/javascript' });
+    const worker = new Worker(URL.createObjectURL(blob));
+    activeWorkerRef.current = worker;
+
+    const totalFiles = files.length;
+    const BATCH_SIZE = 1000; // Process 1,000 files per UI tick to prevent freezing
+    let currentIdx = 0;
+
+    const blacklistRegex = /node_modules[\\/]|PASSWORD[\\/]|\.next[\\/]|\.git[\\/]|dist[\\/]|build[\\/]|out[\\/]|coverage[\\/]/;
+    const MAX_FILE_SIZE = 250 * 1024; // 250 KB
+
+    // 🛠️ Recursive Non-blocking Dispatcher
+    const streamNextBatch = () => {
+      // 🛡️ ABORT GUARD: Stop the loop instantly if user navigated away
+      if (!isMountedRef.current) {
+        console.log("=> [Stream] DETECTION_CANCELLED: COMPONENT_UNMOUNTED");
+        return;
+      }
+
+      if (currentIdx >= totalFiles) {
+        // Send final signal when all files are queued
+        worker.postMessage({ type: 'END' });
+        return;
+      }
+
+      const chunkToTransmit = [];
+      const endIdx = Math.min(currentIdx + BATCH_SIZE, totalFiles);
+
+      // Fast Main Thread Filter loop (Only covers 1000 items per tick)
+      for (let i = currentIdx; i < endIdx; i++) {
+        const file = files[i];
+        const path = file.webkitRelativePath || file.name;
+        
+        const isBlacklisted = blacklistRegex.test(path);
+        const isCodeFile = path.endsWith('.ts') || path.endsWith('.tsx') || path.endsWith('.js');
+        const isSizeOk = file.size <= MAX_FILE_SIZE;
+
+        if (isCodeFile && !isBlacklisted && isSizeOk) {
+          chunkToTransmit.push({
+            file: file,
+            relativePath: path
+          });
+        }
+      }
+
+      currentIdx = endIdx;
+
+      // Dispatch payload chunk across the Thread Boundary
+      if (chunkToTransmit.length > 0) {
+        worker.postMessage({ type: 'CHUNK', data: chunkToTransmit });
+      }
+
+      // 🛠️ Yield control back to Browser UI, but check abort flag first
+      if (isMountedRef.current) {
+        setTimeout(streamNextBatch, 0);
+      }
+    };
+
+    // Listen for the final aggregated result
+    worker.onmessage = (e) => {
+      if (isMountedRef.current) {
+        const data = e.data;
+        if (data.length === 0) {
+          console.log("=> SCAN_COMPLETE: NO_VALID_ENVIRONMENT_VARIABLES_FOUND");
+        }
+        setRawData(data);
+        setIsLoading(false);
+      }
+      worker.terminate(); // Free system memory
+      activeWorkerRef.current = null;
+      event.target.value = ''; 
+    };
+
+    worker.onerror = (err) => {
+      if (isMountedRef.current) {
+        console.error("Local Worker Engine Failure:", err);
+        setApiError("LOCAL_WORKER_CRASHED");
+        setIsLoading(false);
+      }
+      worker.terminate();
+      activeWorkerRef.current = null;
+      event.target.value = ''; 
+    };
+
+    // Ignite the engine
+    streamNextBatch();
+  };
+
+  const { nodes, edges } = useMemo(() => {
+    const flowNodes: Node[] = [];
+    const flowEdges: Edge[] = [];
+
+    if (rawData.length === 0) return { nodes: flowNodes, edges: flowEdges };
+
+    rawData.forEach((env, index) => {
+      const envNodeId = env.id;
+      
+      flowNodes.push({
+        id: envNodeId,
+        position: { x: 50, y: index * 250 },
+        data: { 
+          label: (
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] uppercase opacity-50 font-mono">Environment Var</span>
+              <span className="font-bold font-mono">{env.keyName}</span>
+              <Badge variant="slate" className="w-fit text-[10px] rounded-none border-slate-300">
+                {env.totalUsages} TOTAL USAGES
+              </Badge>
+            </div>
+          ) 
+        },
+        className: "bg-white border-2 border-slate-900 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 min-w-[200px]",
+      });
+
+      const fileAggregation = new Map<string, { lines: number[], snippets: string[] }>();
+      
+      env.dependencies.forEach(dep => {
+        if (!fileAggregation.has(dep.filePath)) {
+          fileAggregation.set(dep.filePath, { lines: [], snippets: [] });
+        }
+        const group = fileAggregation.get(dep.filePath)!;
+        group.lines.push(dep.lineNumber);
+        group.snippets.push(dep.codeSnippet);
+      });
+
+      let fileOffset = 0;
+      fileAggregation.forEach((info, filePath) => {
+        const fileNodeId = `file-${env.keyName}-${filePath}`;
+        const fileName = filePath.split(/[/\\]/).pop() || 'unknown';
+        
+        flowNodes.push({
+          id: fileNodeId,
+          position: { x: 450, y: (index * 250) + (fileOffset * 90) - ((fileAggregation.size - 1) * 45) },
+          data: { 
+            label: (
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase opacity-50 font-mono">Consumer File</span>
+                <span className="text-xs font-bold font-mono truncate max-w-[180px]">{fileName}</span>
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-[9px] font-mono text-slate-500 uppercase">{info.lines.length} LOCATIONS</span>
+                  <span className="text-[8px] font-mono text-slate-400">INSPECT</span>
+                </div>
+              </div>
+            ),
+            fullPath: filePath,
+            fileName: fileName,
+            lines: info.lines,
+            snippets: info.snippets
+          },
+          className: "bg-slate-50 border border-slate-400 rounded-none p-2 text-left min-w-[220px] hover:border-slate-900 hover:bg-white transition-all cursor-pointer shadow-sm hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)]",
+        });
+
+        flowEdges.push({
+          id: `edge-${envNodeId}-${fileNodeId}`,
+          source: envNodeId,
+          target: fileNodeId,
+          animated: true,
+          style: { stroke: '#0f172a', strokeWidth: 2 },
+        });
+
+        fileOffset++;
+      });
+    });
+
+    return { nodes: flowNodes, edges: flowEdges };
+  }, [rawData]);
+
+  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
+    if (node.data && node.data.lines) {
+      setSelectedNode({
+        fileName: node.data.fileName,
+        fullPath: node.data.fullPath,
+        lines: node.data.lines,
+        snippets: node.data.snippets
+      });
+    } else {
+      setSelectedNode(null);
+    }
+  }, [setSelectedNode]);
+
+  // 🛠️ Tactical Loading State
+  if (isLoading) {
+    return (
+      <div 
+        className="w-full border-2 border-slate-900 rounded-none bg-slate-50 flex flex-col items-center justify-center font-mono text-slate-900 gap-4"
+        style={{ height: '800px' }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 bg-slate-900 rounded-full animate-radar-ping" />
+          <span className="text-xs font-black uppercase tracking-[0.2em] animate-pulse">
+            TRANSMITTING PAYLOAD TO IN-MEMORY AST ENGINE...
+          </span>
+        </div>
+        <div className="text-[9px] text-slate-400 uppercase tracking-widest">
+          SECURITY PROTOCOL: ZERO DISK I/O ACTIVE
+        </div>
+      </div>
+    );
+  }
+
+  // 🛠️ Tactical Error State
+  if (apiError) {
+    return (
+      <div 
+        className="w-full border-2 border-red-500 rounded-none bg-red-50 flex flex-col items-center justify-center font-mono text-red-600 p-8 text-center"
+        style={{ height: '800px' }}
+      >
+        <span className="material-symbols-outlined text-4xl mb-4">emergency_home</span>
+        <span className="text-sm font-black uppercase tracking-widest mb-2">CRITICAL: ENGINE FAILURE</span>
+        <div className="bg-white border border-red-200 p-4 text-[10px] text-red-500 uppercase leading-relaxed max-w-md shadow-sm">
+          CODE: {apiError}
+          <br />
+          <span className="text-slate-400 mt-2 block italic text-[9px]">
+            The In-Memory Engine encountered a structural anomaly.
+          </span>
+        </div>
+        <button 
+          onClick={() => setApiError(null)}
+          className="mt-6 px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-colors shadow-[4px_4px_0px_0px_rgba(220,38,38,0.2)]"
+        >
+          ACKNOWLEDGE & RETRY
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col w-full border-2 border-slate-900 rounded-none relative bg-white shadow-sm">
+      
+      {/* 📁 NO-CODE DROPZONE HEADER */}
+      <div className="p-4 lg:p-6 border-b-2 border-slate-900 bg-slate-50 shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col">
+          <span className="font-mono font-black text-[11px] lg:text-xs text-slate-800 uppercase tracking-widest">
+            {rawData.length > 0 ? 'Diagnostic Complete' : 'Awaiting Input Payload'}
+          </span>
+          <span className="font-mono text-[9px] lg:text-[10px] text-slate-500 uppercase tracking-wider mt-1">
+            {rawData.length > 0 
+              ? `Detected ${rawData.length} Environment Variables` 
+              : 'Drag & Drop or Select a Repository Folder to Analyze'}
+          </span>
+        </div>
+
+        <label className="cursor-pointer w-full sm:w-auto text-center group bg-indigo-600 hover:bg-indigo-700 text-white font-mono px-6 py-3 rounded-none text-[10px] lg:text-xs font-black uppercase tracking-widest transition-all shadow-[4px_4px_0px_0px_rgba(79,70,229,0.2)] hover:shadow-none hover:translate-y-1 hover:translate-x-1 flex items-center justify-center gap-2 shrink-0">
+          <span className="material-symbols-outlined text-sm lg:text-base">folder_open</span>
+          <span>{rawData.length > 0 ? 'SCAN ANOTHER FOLDER' : 'SELECT FOLDER'}</span>
+          <input 
+            type="file" 
+            className="hidden" 
+            // @ts-ignore
+            webkitdirectory="true" 
+            directory="true" 
+            multiple 
+            onChange={handleFolderUpload} 
+            disabled={isLoading}
+          />
+        </label>
+      </div>
+
+      <div className="flex flex-col lg:flex-row w-full relative overflow-hidden items-stretch bg-dot-pattern">
+        
+        {/* GRAPH OR EMPTY STATE */}
+        {/* Mobile: 500px height, Desktop: 800px height */}
+        <div className="w-full lg:flex-1 relative min-h-[500px] lg:min-h-[800px]">
+          {rawData.length === 0 ? (
+             <div className="absolute inset-0 flex flex-col items-center justify-center">
+               <span className="material-symbols-outlined text-4xl lg:text-6xl text-slate-200 mb-4">account_tree</span>
+               <span className="font-mono text-[9px] lg:text-[10px] text-slate-400 uppercase tracking-widest bg-white/80 p-2 border border-slate-200">
+                 [ ENGINE STANDBY ]
+               </span>
+             </div>
+          ) : (
+            <ReactFlow 
+              nodes={nodes} 
+              edges={edges} 
+              onNodeClick={onNodeClick}
+              fitView
+            >
+              <Background variant={BackgroundVariant.Dots} size={1} gap={20} color="#cbd5e1" />
+              <Controls className="rounded-none border-2 border-slate-900 shadow-none fill-slate-900" />
+              <Panel position="top-right" className="bg-white border-2 border-slate-900 p-2 font-mono text-[9px] lg:text-[10px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase font-black">
+                In-Memory AST Engine
+              </Panel>
+            </ReactFlow>
+          )}
+        </div>
+
+        {/* INSPECTOR PANEL */}
+        {/* Mobile: Full width below graph, Desktop: Fixed 320px width locking to the right */}
+        {rawData.length > 0 && (
+          <div className="w-full lg:w-80 border-t-2 lg:border-t-0 lg:border-l-2 border-slate-900 bg-white">
+            <DependencyInspector />
+          </div>
+        )}
+
+      </div>
+      
+      <SecurityShield />
+    </div>
+    
+  );
+}
