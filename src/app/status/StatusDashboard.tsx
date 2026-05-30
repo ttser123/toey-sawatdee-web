@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -72,38 +72,15 @@ const CockpitMetric = ({ label, value, sub, warning = false }: { label: string; 
   </div>
 );
 
-const LiveStatus = ({ status, label }: { status: string; label: string }) => {
-  const colors: Record<string, string> = {
-    UP: 'bg-emerald-500',
-    DEGRADED: 'bg-amber-500',
-    DOWN: 'bg-rose-500',
-    UNKNOWN: 'bg-slate-300',
-  };
-  return (
-    <div className="flex items-center justify-between py-1.5 border-b border-slate-50 last:border-0">
-      <div className="flex items-center gap-2">
-        <div className={`h-1.5 w-1.5 rounded-full ${colors[status] || colors.UNKNOWN} ${status !== 'UNKNOWN' ? 'animate-blink' : ''}`} />
-        <span className="text-[10px] font-bold text-slate-700">{label}</span>
-      </div>
-      <div className="flex gap-0.5">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className={`h-2 w-0.5 ${status === 'UP' ? 'bg-emerald-100' : 'bg-rose-100'}`} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
 // ── Main Dashboard ───────────────────────────────────────────────────
 
 export default function StatusDashboard() {
   const [data, setData] = useState<APMData | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isError, setIsError] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(true);
 
   useEffect(() => {
-    setIsSyncing(true);
     // 🛠️ TACTICAL ARCHITECTURE: Open a persistent SSE pipeline to the backend
     const eventSource = new EventSource('/api/status/stream');
 
@@ -162,7 +139,7 @@ export default function StatusDashboard() {
     <div className="space-y-4 pb-8 max-w-7xl mx-auto selection:bg-slate-900 selection:text-white antialiased">
 
       {/* ── Main HUD Header ─────────────────────────────── */}
-      <div className={`flex items-center justify-between p-3 rounded-sm border transition-all duration-700 bg-white/80 backdrop-blur-md ${isError ? 'border-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)]' : 'border-slate-300 shadow-sm'
+      <div className={`flex items-center justify-between p-3 rounded-sm border transition-all duration-700 bg-white/80 backdrop-blur-md ${isError ? 'border-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] bg-rose-50/30' : 'border-slate-300 shadow-sm'
         }`}>
         <div className="flex items-center gap-3">
           <div className="relative h-2 w-2">
@@ -185,6 +162,13 @@ export default function StatusDashboard() {
           {isSyncing && <div className="h-3 w-3 border-2 border-slate-900 border-t-transparent rounded-full animate-spin opacity-40" />}
         </div>
       </div>
+
+      {isError && (
+        <div className="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-sm font-mono text-[10px] uppercase tracking-widest flex items-center gap-3 animate-pulse">
+          <span className="material-symbols-outlined text-sm">warning</span>
+          <span>Sectors Offline: Telemetry Signal Lost. Attempting Reconnection...</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
@@ -284,7 +268,13 @@ export default function StatusDashboard() {
       </div>
 
       {/* Cockpit Footer */}
-      <div className="flex justify-between items-center px-1 text-[8px] font-bold text-slate-300 uppercase tracking-[0.3em]">
+      <div className="flex justify-between items-center px-3 py-2 text-[9px] font-bold text-slate-400 uppercase tracking-[0.1em] font-mono border border-dashed border-slate-200 bg-slate-50/30 rounded-sm">
+        <div>
+          ENV: <span className="text-indigo-600">{data?.pipeline.env || 'DEVELOPMENT'}</span>
+        </div>
+        <div>
+          COMMIT: <span className="text-slate-600">{data?.pipeline.commit || 'dev-local'}</span>
+        </div>
       </div>
 
       <style jsx global>{`

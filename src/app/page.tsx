@@ -9,6 +9,7 @@ import {
   type HeroSection, 
   type ContactChannel 
 } from '@/components/portfolio/PortfolioComponents';
+import { ProjectShowcase } from '@/components/portfolio/ProjectShowcase';
 
 // ── Static Data ──────────────────────────────────────────────────────
 
@@ -40,6 +41,8 @@ export default function Home() {
         data={STATIC_HERO} 
         onViewResume={openResume} 
       />
+
+      <ProjectShowcase />
 
       <ContactSection 
         contacts={STATIC_CONTACTS} 

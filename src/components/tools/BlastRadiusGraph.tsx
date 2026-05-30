@@ -7,7 +7,8 @@ import ReactFlow, {
   Node, 
   Edge, 
   BackgroundVariant,
-  Panel
+  Panel,
+  Position
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
@@ -37,15 +38,22 @@ const workerScript = `
           const text = await item.file.text(); // Read securely in RAM
           if (!text.includes('process.env')) continue; // Silver bullet pre-filter
 
-          const lines = text.split('\\n');
+          // 🛠️ THE FIX 1: คว้านไส้ Block Comments (/*...*/) ออก แต่เหลือ \\n ไว้เพื่อให้เลขบรรทัดไม่คลาดเคลื่อน!
+          const cleanText = text.replace(/\\/\\*[\\s\\S]*?\\*\\//g, (match) => match.replace(/[^\\n]/g, ''));
+          const lines = cleanText.split('\\n');
+
           lines.forEach((lineContent, lineIdx) => {
+            // 🛠️ THE FIX 2: ตัด Inline Comments (//...) ทิ้งไปจากบรรทัดนั้นๆ ซะ
+            const codeOnly = lineContent.split('//')[0];
+            
             let match;
             regex.lastIndex = 0; // Reset regex state
             
-            while ((match = regex.exec(lineContent)) !== null) {
+            // สแกนเฉพาะโค้ดคลีนๆ ที่ไม่มีคอมเมนต์หลงเหลือแล้ว
+            while ((match = regex.exec(codeOnly)) !== null) {
               const keyName = match[1] || match[2];
               const lineNumber = lineIdx + 1;
-              const codeSnippet = lineContent.trim();
+              const codeSnippet = codeOnly.trim();
 
               if (!envMap.has(keyName)) {
                 envMap.set(keyName, { 
@@ -248,12 +256,32 @@ export default function BlastRadiusGraph() {
 
     if (rawData.length === 0) return { nodes: flowNodes, edges: flowEdges };
 
-    rawData.forEach((env, index) => {
-      const envNodeId = env.id;
+    // 🛠️ THE FIX 2: Explicit Y-Axis Column trackers to ensure absolute prevention of overlap
+    let leftColumnY = 0;
+    let rightColumnY = 0;
+
+    // 🛠️ THE FIX 1 (PHASE 2): Tactical Color Palette for Color-Coded Telemetry matching
+    const TACTICAL_COLORS = [
+      '#ef4444', // Red
+      '#f97316', // Orange
+      '#eab308', // Yellow
+      '#22c55e', // Green
+      '#06b6d4', // Cyan
+      '#3b82f6', // Blue
+      '#8b5cf6', // Violet
+      '#d946ef', // Fuchsia
+      '#f43f5e', // Rose
+    ];
+
+    // 1. Create left-side nodes (Environment Variables)
+    rawData.forEach((env, idx) => {
+      const themeColor = TACTICAL_COLORS[idx % TACTICAL_COLORS.length];
       
       flowNodes.push({
-        id: envNodeId,
-        position: { x: 50, y: index * 250 },
+        id: env.id,
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
+        position: { x: 50, y: leftColumnY }, // Distribute cleanly vertically
         data: { 
           label: (
             <div className="flex flex-col gap-1">
@@ -265,11 +293,23 @@ export default function BlastRadiusGraph() {
             </div>
           ) 
         },
-        className: "bg-white border-2 border-slate-900 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 min-w-[200px]",
+        style: {
+          border: `2px solid ${themeColor}`, // Tactical Color outer border
+          borderLeft: `6px solid ${themeColor}`, // Thick accent left border
+          borderRadius: '2px', // Keep rounded-sm sharp edges
+          backgroundColor: '#ffffff', // Blueprint High-contrast White
+          color: '#0f172a', // Primary ink Slate-900
+          padding: '16px',
+          minWidth: '200px',
+          boxShadow: '4px 4px 0px 0px #0f172a', // Blueprint Tactical Shadow
+        }
       });
+      leftColumnY += 120; // Vertically step down for the next environment node
+    });
 
-      const fileAggregation = new Map<string, { lines: number[], snippets: string[] }>();
-      
+    // 2. Aggregate files across ALL environments for high-efficiency unique nodes
+    const fileAggregation = new Map<string, { lines: number[], snippets: string[] }>();
+    rawData.forEach(env => {
       env.dependencies.forEach(dep => {
         if (!fileAggregation.has(dep.filePath)) {
           fileAggregation.set(dep.filePath, { lines: [], snippets: [] });
@@ -278,43 +318,75 @@ export default function BlastRadiusGraph() {
         group.lines.push(dep.lineNumber);
         group.snippets.push(dep.codeSnippet);
       });
+    });
 
-      let fileOffset = 0;
-      fileAggregation.forEach((info, filePath) => {
-        const fileNodeId = `file-${env.keyName}-${filePath}`;
-        const fileName = filePath.split(/[/\\]/).pop() || 'unknown';
-        
-        flowNodes.push({
-          id: fileNodeId,
-          position: { x: 450, y: (index * 250) + (fileOffset * 90) - ((fileAggregation.size - 1) * 45) },
-          data: { 
-            label: (
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] uppercase opacity-50 font-mono">Consumer File</span>
-                <span className="text-xs font-bold font-mono truncate max-w-[180px]">{fileName}</span>
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-[9px] font-mono text-slate-500 uppercase">{info.lines.length} LOCATIONS</span>
-                  <span className="text-[8px] font-mono text-slate-400">INSPECT</span>
-                </div>
+    // 3. Create right-side nodes (Consumer Files - merged cleanly to prevent duplication)
+    const filePaths = Array.from(fileAggregation.keys());
+    filePaths.forEach((filePath) => {
+      const consumerId = `file-${filePath}`;
+      const fileName = filePath.split(/[/\\]/).pop() || 'unknown';
+      const info = fileAggregation.get(filePath)!;
+      
+      // Smart Labeling for Next.js App Router (e.g., api/scan/route.ts -> scan/route.ts)
+      const pathParts = filePath.split(/[\\/]/);
+      const smartLabel = pathParts.length > 1 
+        ? `${pathParts[pathParts.length - 2]}/${pathParts[pathParts.length - 1]}`
+        : filePath;
+      
+      flowNodes.push({
+        id: consumerId,
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
+        position: { x: 500, y: rightColumnY }, // Offset cleanly horizontally & vertically using independent right Y tracker
+        data: { 
+          label: (
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] uppercase opacity-50 font-mono">Consumer File</span>
+              <span className="text-xs font-bold font-mono truncate max-w-[180px]">{smartLabel}</span>
+              <div className="flex justify-between items-center mt-1">
+                <span className="text-[9px] font-mono text-slate-500 uppercase">{info.lines.length} LOCATIONS</span>
+                <span className="text-[8px] font-mono text-slate-400">INSPECT</span>
               </div>
-            ),
-            fullPath: filePath,
-            fileName: fileName,
-            lines: info.lines,
-            snippets: info.snippets
-          },
-          className: "bg-slate-50 border border-slate-400 rounded-none p-2 text-left min-w-[220px] hover:border-slate-900 hover:bg-white transition-all cursor-pointer shadow-sm hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)]",
-        });
+            </div>
+          ),
+          fullPath: filePath,
+          fileName: fileName,
+          lines: info.lines,
+          snippets: info.snippets
+        },
+        style: {
+          border: '1px solid #cbd5e1', // border-slate-300
+          borderLeft: '4px solid #475569', // Slate accent left border
+          borderRadius: '2px', // Blueprint rounded-sm
+          backgroundColor: '#f8fafc', // Slate-50 background
+          color: '#334155', // text-slate-700
+          padding: '12px',
+          minWidth: '220px',
+          cursor: 'pointer',
+        }
+      });
+      rightColumnY += 95; // Vertically step down for the next unique consumer node
+    });
 
+    // 4. Create connections (Edges - Bezier curve with tactical colors to prevent overlapping lines)
+    rawData.forEach((env, idx) => {
+      const themeColor = TACTICAL_COLORS[idx % TACTICAL_COLORS.length];
+      const uniqueFilesForEnv = new Set(env.dependencies.map(d => d.filePath));
+      
+      uniqueFilesForEnv.forEach(filePath => {
+        const consumerId = `file-${filePath}`;
         flowEdges.push({
-          id: `edge-${envNodeId}-${fileNodeId}`,
-          source: envNodeId,
-          target: fileNodeId,
+          id: `edge-${env.id}-${consumerId}`,
+          source: env.id,
+          target: consumerId,
+          type: 'default', // 🛠️ Bezier Curves to ensure separate angles and prevent overlay
           animated: true,
-          style: { stroke: '#0f172a', strokeWidth: 2 },
+          style: { 
+            stroke: themeColor, // 🛠️ Color-Coded Telemetry
+            strokeWidth: 2, 
+            opacity: 0.6 
+          },
         });
-
-        fileOffset++;
       });
     });
 

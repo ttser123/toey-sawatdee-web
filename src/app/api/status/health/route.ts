@@ -16,7 +16,7 @@ try {
     if (entry) lastGCDuration = entry.duration;
   });
   obs.observe({ entryTypes: ['gc'], buffered: true });
-} catch (e) {
+} catch {
   // PerformanceObserver might not be fully supported in all environments
 }
 
@@ -58,7 +58,7 @@ interface APMResponse {
   timestamp: string;
 }
 
-async function runProbe(name: string, url: string, parser?: (data: any) => 'UP' | 'DOWN' | 'DEGRADED'): Promise<ProbeResult> {
+async function runProbe(name: string, url: string, parser?: (data: unknown) => 'UP' | 'DOWN' | 'DEGRADED'): Promise<ProbeResult> {
   const start = Date.now();
   const ctrl = new AbortController();
   const timeout = setTimeout(() => ctrl.abort(), 3000);
@@ -94,7 +94,8 @@ export async function GET() {
       ? runProbe('AWS_COGNITO', `https://cognito-idp.${cognitoPoolId.split('_')[0]}.amazonaws.com/${cognitoPoolId}/.well-known/openid-configuration`)
       : Promise.resolve({ name: 'AWS_COGNITO', status: 'UNKNOWN', latency: null }),
     runProbe('GITHUB_GLOBAL', 'https://www.githubstatus.com/api/v2/status.json', (d) => {
-      const ind = d?.status?.indicator;
+      const res = d as { status?: { indicator?: string } } | null;
+      const ind = res?.status?.indicator;
       return ind === 'none' ? 'UP' : ind === 'minor' ? 'DEGRADED' : 'DOWN';
     }),
   ]);
@@ -103,9 +104,11 @@ export async function GET() {
 
   // Disk Usage (Linux Fallback)
   let diskUsage = 'N/A';
-  try {
-    diskUsage = execSync("df -h / | awk 'NR==2 {print $5}'", { timeout: 1000 }).toString().trim();
-  } catch {}
+  if (os.platform() !== 'win32') {
+    try {
+      diskUsage = execSync("df -h / | awk 'NR==2 {print $5}'", { timeout: 1000, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+    } catch {}
+  }
 
   const response: APMResponse = {
     kernel: {
