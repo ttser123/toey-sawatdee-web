@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         // 1. Upload to S3
         await s3Client.send(new PutObjectCommand({
             Bucket: BUCKET_NAME,
-            Key: 'resume.pdf',
+            Key: 'assets/resume.pdf',
             Body: buffer,
             ContentType: 'application/pdf',
         }));
