@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { CloudFrontClient, CreateInvalidationCommand } from '@aws-sdk/client-cloudfront';
+import fs from 'fs';
+import path from 'path';
 
 const s3Client = new S3Client({
     region: process.env.AWS_REGION || 'ap-southeast-2',
@@ -31,6 +33,20 @@ export async function POST(req: NextRequest) {
             Body: buffer,
             ContentType: 'application/pdf',
         }));
+
+        // 1b. Write to local filesystem as a fallback/sync measure
+        try {
+            const localPath = path.join(process.cwd(), 'public', 'assets', 'resume.pdf');
+            // Ensure public/assets directory exists
+            const dirPath = path.dirname(localPath);
+            if (!fs.existsSync(dirPath)) {
+                fs.mkdirSync(dirPath, { recursive: true });
+            }
+            fs.writeFileSync(localPath, buffer);
+            console.log('=> [Sync] Resume successfully written to local public assets');
+        } catch (localWriteError) {
+            console.warn('=> [Sync Warning] Failed to sync uploaded resume to local filesystem:', localWriteError);
+        }
 
         // 2. Invalidate CloudFront Cache if distribution ID is available
         if (DISTRIBUTION_ID) {

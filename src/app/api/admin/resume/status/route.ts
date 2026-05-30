@@ -1,29 +1,50 @@
 // src/app/api/admin/resume/status/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
 // ── Architectural Rule ───────────────────────────────────────────────
 // Force Next.js to treat this route as fully dynamic at runtime.
-// Without these directives, Next.js App Router will pre-render (bake)
-// the GET response at build time during CI/CD, causing fs.statSync
-// to either read stale build-time data or fail with ENOENT in the
-// standalone output where public/ may not yet exist.
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    // Resolve the asset path relative to the standalone server root.
-    // In Next.js standalone mode, process.cwd() points to the
-    // directory containing server.js, where public/ must be explicitly
-    // COPY'd in the Dockerfile's runner stage.
+    // 1. Try to fetch the live Last-Modified header from the public CloudFront CDN
+    try {
+      const host = req.headers.get('host') || 'toey-sawatdee.me';
+      // In local dev, fetch via http, otherwise https
+      const protocol = host.includes('localhost') || host.includes('127.0.0.1') ? 'http' : 'https';
+      const resumeUrl = `${protocol}://${host}/assets/resume.pdf`;
+
+      console.log(`=> [API Status] Querying HTTP HEAD of: ${resumeUrl}`);
+      const response = await fetch(resumeUrl, {
+        method: 'HEAD',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+
+      const lastModifiedHeader = response.headers.get('last-modified');
+      if (lastModifiedHeader) {
+        const formattedDate = new Date(lastModifiedHeader).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        });
+        console.log(`=> [API Status Success] Live last modified date: ${formattedDate} UTC`);
+        return NextResponse.json({ lastModified: `${formattedDate} UTC` });
+      }
+    } catch (fetchError) {
+      console.warn('=> [API Status Warning] Failed to fetch HEAD of resume from public URL, falling back to filesystem:', fetchError);
+    }
+
+    // 2. Fallback: Read live metadata from the container's filesystem.
     const filePath = path.join(process.cwd(), 'public', 'assets', 'resume.pdf');
 
-    // Guard clause: verify the file was successfully copied into the
-    // Docker container. If the Dockerfile is missing the
-    // `COPY --from=builder /app/public ./public` directive, this will
-    // catch the ENOENT before it becomes an unhandled crash.
     if (!fs.existsSync(filePath)) {
       console.error(`=> [API Error] Resume asset not found at path: ${filePath}`);
       return NextResponse.json(
@@ -32,10 +53,6 @@ export async function GET() {
       );
     }
 
-    // Read live metadata from the container's filesystem.
-    // NOTE: In Docker, mtime reflects the image build timestamp due to
-    // COPY layer semantics, not the original file's edit date. This is
-    // a known Docker limitation — the value shown is "last deployed".
     const stats = fs.statSync(filePath);
 
     const formattedDate = new Date(stats.mtime).toLocaleDateString('en-GB', {
@@ -47,6 +64,7 @@ export async function GET() {
       hour12: false,
     });
 
+    console.log(`=> [API Status Fallback] Local file last modified date: ${formattedDate} UTC`);
     return NextResponse.json({ lastModified: `${formattedDate} UTC` });
   } catch (err) {
     console.error('=> [Critical API Failure] Failed to read resume stats:', err);
