@@ -1,36 +1,21 @@
 // src/app/admin/layout.tsx
-'use client';
+import type { Metadata } from 'next';
+import AdminGuard from './AdminGuard';
 
-import { useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/components/AuthProvider';
+export const metadata: Metadata = {
+    title: 'Admin Panel',
+    robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+            index: false,
+            follow: false,
+            noimageindex: true,
+        },
+    },
+};
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-    const router = useRouter();
-    const pathname = usePathname();
-    const { isAuthenticated, isLoading } = useAuth();
-
-    useEffect(() => {
-        if (!isLoading && !isAuthenticated) {
-            router.replace(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
-        }
-    }, [isLoading, isAuthenticated, router, pathname]);
-
-    if (isLoading) {
-        return (
-            <div className="flex-1 flex items-center justify-center bg-gray-50">
-                <p className="text-gray-400 text-sm animate-pulse">Checking permissions...</p>
-            </div>
-        );
-    }
-
-    if (!isAuthenticated) {
-        return (
-            <div className="flex-1 flex items-center justify-center bg-gray-50">
-                <p className="text-gray-400 text-sm animate-pulse">Redirecting to login...</p>
-            </div>
-        );
-    }
-
-    return <>{children}</>;
+    return <AdminGuard>{children}</AdminGuard>;
 }

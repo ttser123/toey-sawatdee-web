@@ -8,11 +8,43 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://toey-sawatdee.me'),
-    title: 'Parinya Sawatdee | Cloud Infrastructure & Software Engineer',
-    description: 'Motivated Software Engineer specializing in AWS, Next.js, and SRE Observability. Exploring infrastructure limits.',
+    title: {
+        default: 'Parinya Sawatdee | Cloud Infrastructure & Software Engineer',
+        template: '%s | Parinya Sawatdee',
+    },
+    description:
+        'Motivated Software Engineer specializing in AWS, Next.js, CI/CD pipelines, and SRE Observability. Building scalable cloud infrastructure and exploring system limits.',
+    keywords: [
+        'Parinya Sawatdee',
+        'Cloud Engineer',
+        'Software Engineer',
+        'AWS',
+        'Next.js',
+        'CI/CD',
+        'DevOps',
+        'SRE',
+        'Observability',
+        'Cloud Infrastructure',
+        'Portfolio',
+    ],
+    alternates: {
+        canonical: 'https://toey-sawatdee.me',
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+        },
+    },
     openGraph: {
         title: 'Parinya Sawatdee | Cloud & Software Engineer',
-        description: 'Motivated Software Engineer specializing in AWS, Next.js, and SRE Observability. Exploring infrastructure limits.',
+        description:
+            'Motivated Software Engineer specializing in AWS, Next.js, CI/CD pipelines, and SRE Observability. Building scalable cloud infrastructure.',
         url: 'https://toey-sawatdee.me',
         siteName: 'Toey Sawatdee Portfolio',
         images: [
@@ -29,7 +61,8 @@ export const metadata: Metadata = {
     twitter: {
         card: 'summary_large_image',
         title: 'Parinya Sawatdee | Cloud & Software Engineer',
-        description: 'Motivated Software Engineer specializing in AWS, Next.js, and SRE Observability. Exploring infrastructure limits.',
+        description:
+            'Motivated Software Engineer specializing in AWS, Next.js, CI/CD pipelines, and SRE Observability. Building scalable cloud infrastructure.',
         images: ['/Open Graph.png'],
     },
 };
