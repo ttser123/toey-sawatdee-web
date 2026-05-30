@@ -30,6 +30,14 @@ resource "aws_iam_user_policy" "deployer_policy" {
           "ssm:SendCommand"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "arn:aws:s3:::toey-sawatdee-assets-prod/*"
       }
     ]
   })

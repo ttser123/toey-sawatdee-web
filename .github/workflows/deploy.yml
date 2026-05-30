@@ -40,6 +40,9 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -47,8 +50,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Sync Static Assets to S3
+        run: |
+          aws s3 sync public/assets/ s3://toey-sawatdee-assets-prod/assets/
+
       - name: Deploy via AWS Systems Manager (SSM)
         run: |
+          DIST_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Aliases.Items[?contains(@,'toey-sawatdee.me')]].Id" \
+            --output text)
+
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Name,Values=toey-sawatdee-prod" \
@@ -58,7 +69,7 @@ jobs:
               "docker pull ghcr.io/ttser123/toey-sawatdee/toey-sawatdee:latest",
               "docker stop toey-sawatdee || true",
               "docker rm toey-sawatdee || true",
-              "docker run -d -p 80:3000 --name toey-sawatdee --restart unless-stopped ghcr.io/ttser123/toey-sawatdee/toey-sawatdee:latest"
+              "docker run -d -p 80:3000 --name toey-sawatdee -e CLOUDFRONT_DISTRIBUTION_ID='"$DIST_ID"' --restart unless-stopped ghcr.io/ttser123/toey-sawatdee/toey-sawatdee:latest"
             ]' \
             --comment "Secure Zero-SSH Deployment for toey-sawatdee" \
             --timeout-seconds 60 \

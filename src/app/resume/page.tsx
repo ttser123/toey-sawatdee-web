@@ -10,8 +10,6 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 const Document = dynamic(() => import('react-pdf').then(mod => mod.Document), { ssr: false });
 const Page = dynamic(() => import('react-pdf').then(mod => mod.Page), { ssr: false });
 
-const RESUME_URL = '/assets/resume.pdf';
-
 export default function ResumeViewerPage() {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -70,7 +68,7 @@ export default function ResumeViewerPage() {
         
         <div className="flex items-center gap-3">
           <a 
-            href={RESUME_URL} 
+            href="/assets/resume.pdf" 
             download="Parinya_Sawatdee_Resume.pdf"
             className={`flex items-center gap-2 px-4 py-2 transition-all font-mono text-[10px] font-black uppercase tracking-widest ${
               error 
@@ -113,7 +111,7 @@ export default function ResumeViewerPage() {
         ) : (
           <div className="shadow-2xl border border-slate-300 transition-transform duration-500 group-hover:scale-[1.01]">
             <Document
-              file={RESUME_URL}
+              file="/assets/resume.pdf"
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
               loading={null}
