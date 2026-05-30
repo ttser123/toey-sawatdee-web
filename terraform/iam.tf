@@ -34,6 +34,13 @@ resource "aws_iam_user_policy" "deployer_policy" {
       {
         Effect = "Allow"
         Action = [
+          "s3:ListBucket"
+        ]
+        Resource = "arn:aws:s3:::toey-sawatdee-assets-prod"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "s3:PutObject",
           "s3:DeleteObject"
         ]
