@@ -52,7 +52,11 @@ jobs:
 
       - name: Sync Static Assets to S3
         run: |
-          aws s3 sync public/assets/ s3://toey-sawatdee-assets-prod/assets/
+          if [ -d "public/assets" ]; then
+            aws s3 sync public/assets/ s3://toey-sawatdee-assets-prod/assets/
+          else
+            echo "Directory public/assets does not exist, skipping S3 sync."
+          fi
 
       - name: Deploy via AWS Systems Manager (SSM)
         run: |
