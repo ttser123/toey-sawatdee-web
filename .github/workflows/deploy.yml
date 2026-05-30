@@ -55,10 +55,10 @@ jobs:
             --parameters 'commands=[
               "TOKEN=$(aws ssm get-parameter --name /toey-sawatdee/prod/ghcr-token --with-decryption --query Parameter.Value --output text --region ap-southeast-2)",
               "echo $TOKEN | docker login ghcr.io -u ${{ github.actor }} --password-stdin",
-              "docker pull ghcr.io/${{ github.repository }}/toey-sawatdee:latest",
+              "docker pull ghcr.io/ttser123/toey-sawatdee/toey-sawatdee:latest",
               "docker stop toey-sawatdee || true",
               "docker rm toey-sawatdee || true",
-              "docker run -d -p 80:3000 --name toey-sawatdee --restart unless-stopped ghcr.io/${{ github.repository }}/toey-sawatdee:latest"
+              "docker run -d -p 80:3000 --name toey-sawatdee --restart unless-stopped ghcr.io/ttser123/toey-sawatdee/toey-sawatdee:latest"
             ]' \
             --comment "Secure Zero-SSH Deployment for toey-sawatdee" \
             --timeout-seconds 60 \
