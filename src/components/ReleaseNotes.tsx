@@ -18,6 +18,18 @@ const releaseNotes: ReleaseNote[] = [
   {
     date: 'May 30, 2026',
     isoDate: '2026-05-30',
+    title: 'Block-Based CMS Architecture & Resilient SRE Telemetry (v2.1.0)',
+    changes: [
+      '**JSON Block-Based CMS (v2.1.0):** Overhauled the Project Showcase portfolio data model to support a headless, block-based architecture. Decoupled raw strings and enwrapped articles into modular deep-dive components, enabling interleaved sections of technical content and optimized figures.',
+      '**Image Interleaving & Containment:** Redesigned the portfolio modal (`max-w-5xl`) to render dynamic project sections. Introduced CSS contain logic for next/image components to ensure network and architecture diagrams display gracefully without truncation.',
+      '**Cross-Platform Telemetry Resilience:** Hardened the Server-Sent Events (SSE) telemetry pipeline. Implemented platform-guarding for CPU/Disk metrics (`win32` checks) and suppressed terminal shell errors on local Windows environment startups.',
+      '**SSE Connection Lifecycle Management:** Integrated an asynchronous `isClosed` stream sentinel. Gracefully terminates and blocks enqueuing attempts to aborted ReadableStreams, preventing server-side `ERR_INVALID_STATE` unhandled rejections.',
+      '**Next.js Open Graph SEO Integration:** Authorized full Open Graph and Twitter Card tags in layout settings. Synchronized relative assets with the `metadataBase` origin URL to solve build-time compilation warnings and ensure correct social media crawling.',
+    ]
+  },
+  {
+    date: 'May 30, 2026',
+    isoDate: '2026-05-30',
     title: 'Serverless AST Engine & Real-time Telemetry (v2.0)',
     changes: [
       '**Env Tracker (v2.0):** Completely re-engineered the environment variable scanner to a 100% Serverless Web Worker architecture. Shifting AST processing from the server to the browser sandbox, resulting in 0ms network latency and zero server-side CPU overhead.',

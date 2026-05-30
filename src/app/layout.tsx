@@ -7,8 +7,31 @@ import ClientLayout from '@/components/ClientLayout';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'Toey Sawatdee',
-    description: 'Cloud Infrastructure by Toey Sawatdee',
+    metadataBase: new URL('https://toey-sawatdee.me'),
+    title: 'Parinya Sawatdee | Cloud Infrastructure & Software Engineer',
+    description: 'Motivated Software Engineer specializing in AWS, Next.js, and SRE Observability. Exploring infrastructure limits.',
+    openGraph: {
+        title: 'Parinya Sawatdee | Cloud & Software Engineer',
+        description: 'Motivated Software Engineer specializing in AWS, Next.js, and SRE Observability. Exploring infrastructure limits.',
+        url: 'https://toey-sawatdee.me',
+        siteName: 'Toey Sawatdee Portfolio',
+        images: [
+            {
+                url: '/Open Graph.png',
+                width: 1200,
+                height: 630,
+                alt: 'Parinya Sawatdee Portfolio Preview',
+            },
+        ],
+        locale: 'en_US',
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Parinya Sawatdee | Cloud & Software Engineer',
+        description: 'Motivated Software Engineer specializing in AWS, Next.js, and SRE Observability. Exploring infrastructure limits.',
+        images: ['/Open Graph.png'],
+    },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
