@@ -53,7 +53,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             <div className="flex flex-col md:flex-row h-screen overflow-hidden relative">
                 <Sidebar />
                 <main className="flex-1 overflow-y-auto">
-                    <div className="w-full max-w-7xl mx-auto p-4 md:p-8 lg:p-12 space-y-8 pb-24 animate-in fade-in duration-1000">
+                    <div className="w-full max-w-7xl mx-auto p-4 md:p-8 lg:p-12 space-y-8 pb-24 animate-fade-in-composited">
                         <HudHeader title={title} subtitle={subtitle} />
                         {children}
                     </div>

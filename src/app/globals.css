@@ -169,6 +169,28 @@ input[type=number] {
   animation: radar-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+/* 7. Composited and optimized fade-in for page transitions */
+@keyframes fade-in-composited {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in-composited {
+  animation: fade-in-composited 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: opacity;
+}
+
+/* 8. Composited and subtle pulse animation */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: opacity;
+}
+
 /* ── Blueprint Utility Classes ─────────────────────────────────── */
 
 .blueprint-input {

@@ -38,7 +38,7 @@ export function ProjectShowcase() {
 
       {/* ── Grid Layout Cards ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {PROJECTS_DATA.map((project) => (
+        {PROJECTS_DATA.map((project, index) => (
           <div 
             key={project.id} 
             className={`card-blueprint flex flex-col bg-white/80 backdrop-blur-sm border transition-all duration-300 hover:border-indigo-400 relative overflow-hidden group ${
@@ -61,12 +61,12 @@ export function ProjectShowcase() {
               >
                 <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors z-20"></div>
                 <Image 
-                  src={project.imageUrl} 
-                  alt={project.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 z-10"
-                  priority={project.featured} // เร่งโหลดรูป Featured ทันทีที่เปิดเว็บ
+                   src={project.imageUrl} 
+                   alt={project.title}
+                   fill
+                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                   className="object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 z-10"
+                   priority={project.featured || index === 0} // เร่งโหลดรูป Featured หรือรูปแรกสุด (LCP) ทันทีที่เปิดเว็บ
                 />
               </div>
             )}

@@ -91,8 +91,21 @@ export default function BlastRadiusGraph() {
   const [isLoading, setIsLoading] = useState<boolean>(true); // Start in loading state
   const [apiError, setApiError] = useState<string | null>(null);
   const [isCustomScan, setIsCustomScan] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   
   const setSelectedNode = useInspectorStore((state) => state.setSelectedNode);
+
+  // 🛠️ DETECT MOBILE VIEWPORT
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // 🛠️ TACTICAL ARCHITECTURE: Lifecycle Management Refs
   const isMountedRef = useRef<boolean>(true);
@@ -135,9 +148,10 @@ export default function BlastRadiusGraph() {
         if (isMountedRef.current) {
           setRawData(data);
         }
-      } catch (err: any) {
+      } catch (err) {
         if (isMountedRef.current) {
-          console.warn("Server telemetry unavailable, using embedded snapshot:", err.message);
+          const errMsg = err instanceof Error ? err.message : String(err);
+          console.warn("Server telemetry unavailable, using embedded snapshot:", errMsg);
           // FALLBACK: Use the pre-bundled snapshot data instead of showing an error
           setRawData(defaultEnvSnapshot as EnvNodeData[]);
           setApiError(null); // Clear any error — snapshot is valid data
@@ -281,30 +295,30 @@ export default function BlastRadiusGraph() {
         id: env.id,
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
-        position: { x: 50, y: leftColumnY }, // Distribute cleanly vertically
+        position: { x: isMobile ? 10 : 50, y: leftColumnY }, // Distribute cleanly vertically
         data: { 
           label: (
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase opacity-50 font-mono">Environment Var</span>
-              <span className="font-bold font-mono">{env.keyName}</span>
-              <Badge variant="slate" className="w-fit text-[10px] rounded-none border-slate-300">
-                {env.totalUsages} TOTAL USAGES
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[8px] sm:text-[10px] uppercase opacity-50 font-mono">Env Var</span>
+              <span className="font-bold font-mono text-[9px] sm:text-xs break-all max-w-[110px] sm:max-w-[180px]">{env.keyName}</span>
+              <Badge variant="slate" className="w-fit text-[7px] sm:text-[9px] px-1.5 py-0 rounded-none border-slate-300">
+                {env.totalUsages} {isMobile ? 'USAGES' : 'TOTAL USAGES'}
               </Badge>
             </div>
           ) 
         },
         style: {
           border: `2px solid ${themeColor}`, // Tactical Color outer border
-          borderLeft: `6px solid ${themeColor}`, // Thick accent left border
+          borderLeft: isMobile ? `4px solid ${themeColor}` : `6px solid ${themeColor}`, // Thick accent left border
           borderRadius: '2px', // Keep rounded-sm sharp edges
           backgroundColor: '#ffffff', // Blueprint High-contrast White
           color: '#0f172a', // Primary ink Slate-900
-          padding: '16px',
-          minWidth: '200px',
-          boxShadow: '4px 4px 0px 0px #0f172a', // Blueprint Tactical Shadow
+          padding: isMobile ? '8px 10px' : '16px',
+          minWidth: isMobile ? '135px' : '200px',
+          boxShadow: isMobile ? '2px 2px 0px 0px #0f172a' : '4px 4px 0px 0px #0f172a', // Blueprint Tactical Shadow
         }
       });
-      leftColumnY += 120; // Vertically step down for the next environment node
+      leftColumnY += isMobile ? 85 : 120; // Vertically step down for the next environment node
     });
 
     // 2. Aggregate files across ALL environments for high-efficiency unique nodes
@@ -337,15 +351,15 @@ export default function BlastRadiusGraph() {
         id: consumerId,
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
-        position: { x: 500, y: rightColumnY }, // Offset cleanly horizontally & vertically using independent right Y tracker
+        position: { x: isMobile ? 190 : 500, y: rightColumnY }, // Offset cleanly horizontally & vertically using independent right Y tracker
         data: { 
           label: (
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase opacity-50 font-mono">Consumer File</span>
-              <span className="text-xs font-bold font-mono truncate max-w-[180px]">{smartLabel}</span>
-              <div className="flex justify-between items-center mt-1">
-                <span className="text-[9px] font-mono text-slate-500 uppercase">{info.lines.length} LOCATIONS</span>
-                <span className="text-[8px] font-mono text-slate-400">INSPECT</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[8px] sm:text-[10px] uppercase opacity-50 font-mono">{isMobile ? 'Consumer' : 'Consumer File'}</span>
+              <span className="text-[9px] sm:text-xs font-bold font-mono truncate max-w-[110px] sm:max-w-[180px]">{smartLabel}</span>
+              <div className="flex justify-between items-center mt-0.5 sm:mt-1">
+                <span className="text-[7px] sm:text-[9px] font-mono text-slate-500 uppercase">{info.lines.length} {isMobile ? 'LOC' : 'LOCATIONS'}</span>
+                <span className="text-[7px] sm:text-[8px] font-mono text-slate-400">{isMobile ? 'TAP' : 'INSPECT'}</span>
               </div>
             </div>
           ),
@@ -360,12 +374,13 @@ export default function BlastRadiusGraph() {
           borderRadius: '2px', // Blueprint rounded-sm
           backgroundColor: '#f8fafc', // Slate-50 background
           color: '#334155', // text-slate-700
-          padding: '12px',
-          minWidth: '220px',
+          padding: isMobile ? '8px 10px' : '12px',
+          minWidth: isMobile ? '135px' : '220px',
           cursor: 'pointer',
+          boxShadow: isMobile ? '2px 2px 0px 0px rgba(0,0,0,0.05)' : undefined,
         }
       });
-      rightColumnY += 95; // Vertically step down for the next unique consumer node
+      rightColumnY += isMobile ? 75 : 95; // Vertically step down for the next unique consumer node
     });
 
     // 4. Create connections (Edges - Bezier curve with tactical colors to prevent overlapping lines)
@@ -391,7 +406,12 @@ export default function BlastRadiusGraph() {
     });
 
     return { nodes: flowNodes, edges: flowEdges };
-  }, [rawData]);
+  }, [rawData, isMobile]);
+
+  const fitViewOptions = useMemo(() => ({
+    padding: isMobile ? 0.05 : 0.1,
+    includeHiddenNodes: true,
+  }), [isMobile]);
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     if (node.data && node.data.lines) {
@@ -411,7 +431,7 @@ export default function BlastRadiusGraph() {
     return (
       <div 
         className="w-full border-2 border-slate-900 rounded-none bg-slate-50 flex flex-col items-center justify-center font-mono text-slate-900 gap-4 px-4"
-        style={{ height: '500px' }}
+        style={{ height: isMobile ? '360px' : '500px' }}
       >
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 bg-slate-900 rounded-full animate-radar-ping" />
@@ -431,7 +451,7 @@ export default function BlastRadiusGraph() {
     return (
       <div 
         className="w-full border-2 border-rose-400 rounded-none bg-rose-50 flex flex-col items-center justify-center font-mono text-rose-600 p-8 text-center"
-        style={{ height: '500px' }}
+        style={{ height: isMobile ? '360px' : '500px' }}
       >
         <span className="material-symbols-outlined text-4xl mb-4">emergency_home</span>
         <span className="text-sm font-black uppercase tracking-widest mb-2">CRITICAL: ENGINE FAILURE</span>
@@ -477,7 +497,7 @@ export default function BlastRadiusGraph() {
               <input 
                 type="file" 
                 className="hidden" 
-                // @ts-ignore
+                // @ts-expect-error
                 webkitdirectory="true" 
                 directory="true" 
                 multiple 
@@ -498,7 +518,7 @@ export default function BlastRadiusGraph() {
 
       <div className="flex flex-col lg:flex-row w-full relative overflow-hidden items-stretch bg-dot-pattern">
         
-        <div className="w-full lg:flex-1 relative" style={{ minHeight: '400px' }}>
+        <div className="w-full lg:flex-1 relative" style={{ height: isMobile ? '360px' : '550px' }}>
           {/* Mobile hint: ReactFlow requires touch gestures */}
           <div className="absolute top-2 left-2 z-10 lg:hidden bg-white/90 border border-slate-200 px-2 py-1 rounded-sm">
             <span className="text-[8px] font-mono text-slate-400 uppercase tracking-wider">Pinch to zoom / Drag to pan</span>
@@ -516,10 +536,11 @@ export default function BlastRadiusGraph() {
               edges={edges} 
               onNodeClick={onNodeClick}
               fitView
+              fitViewOptions={fitViewOptions}
             >
               <Background variant={BackgroundVariant.Dots} size={1} gap={20} color="#cbd5e1" />
               <Controls className="rounded-none border-2 border-slate-900 shadow-none fill-slate-900" />
-              <Panel position="top-right" className="bg-white border-2 border-slate-900 p-2 font-mono text-[9px] lg:text-[10px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase font-black">
+              <Panel position="top-right" className="hidden sm:block bg-white border-2 border-slate-900 p-2 font-mono text-[9px] lg:text-[10px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase font-black">
                 In-Memory AST Engine
               </Panel>
             </ReactFlow>
@@ -529,7 +550,7 @@ export default function BlastRadiusGraph() {
         {/* INSPECTOR PANEL */}
         {/* Mobile: Full width below graph, Desktop: Fixed 320px width locking to the right */}
         {rawData.length > 0 && (
-          <div className="w-full lg:w-80 border-t-2 lg:border-t-0 lg:border-l-2 border-slate-900 bg-white max-h-[400px] lg:max-h-none overflow-y-auto">
+          <div className="w-full lg:w-80 border-t-2 lg:border-t-0 lg:border-l-2 border-slate-900 bg-white h-[350px] lg:h-auto flex flex-col overflow-hidden shrink-0">
             <DependencyInspector />
           </div>
         )}

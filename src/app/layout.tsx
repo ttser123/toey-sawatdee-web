@@ -68,10 +68,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     return (
         <html lang="en">
             <head>
-                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                {apiUrl && <link rel="preconnect" href={apiUrl} crossOrigin="anonymous" />}
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
             </head>
             <body className={`${inter.className} relative min-h-screen bg-slate-50`}>
                 {/* 🌌 LAYER 1: Background Dots (อยู่หลังสุด) */}
