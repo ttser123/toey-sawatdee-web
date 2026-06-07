@@ -13,7 +13,6 @@ const getPageTitle = (pathname: string) => {
     if (pathname === '/tools/env-tracker') return 'ENV TRACKER';
     if (pathname === '/tools/subnet-solver') return 'SUBNET SOLVER';
     if (pathname === '/admin/finance') return 'FINANCE';
-    if (pathname === '/status') return 'SYSTEM STATUS';
     if (pathname === '/release-notes') return 'UPDATE LOGS';
     if (pathname.includes('/admin/admin-log')) return 'ADMIN LOG';
 
@@ -30,7 +29,6 @@ const getPageSubtitle = (pathname: string) => {
     if (pathname === '/tools/env-tracker') return 'Blast Radius Simulator & AST Analysis';
     if (pathname === '/tools/subnet-solver') return 'Network Collision Resolution Tool';
     if (pathname === '/admin/finance') return 'Financial Administration Console';
-    if (pathname === '/status') return 'Real-time Metrics & Health Monitoring';
     if (pathname === '/release-notes') return 'System Changelog & Deployment History';
     if (pathname.includes('/admin/admin-log')) return 'Security & Authentication Audit Trail';
 

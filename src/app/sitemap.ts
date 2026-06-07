@@ -11,12 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: 'monthly',
             priority: 1,
         },
-        {
-            url: `${BASE_URL}/status`,
-            lastModified: new Date(),
-            changeFrequency: 'daily',
-            priority: 0.8,
-        },
+
         {
             url: `${BASE_URL}/overview`,
             lastModified: new Date(),

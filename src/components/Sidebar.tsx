@@ -14,18 +14,10 @@ const topNav = [
   { href: '/overview', icon: 'bar_chart', label: 'Overview' },
 ];
 
-interface GameZone {
-  href: string;
-  icon?: string;
-  label: string;
-  zone?: string;
-}
 
-const gameServerItems: GameZone[] = [];
 
 const bottomNav = [
   { href: '/tools', icon: 'construction', label: 'Tools' },
-  { href: '/status', icon: 'monitor_heart', label: 'Status' },
   { href: '/release-notes', icon: 'update', label: 'Release Notes' },
 ];
 
@@ -34,7 +26,7 @@ const adminNav = [
   { href: '/admin/resume', icon: 'description', label: 'Resume' },
 ];
 
-const GAMES_DROPDOWN_ID = 'games-server-dropdown';
+
 
 // ── Sub-Components (Declared outside of render to prevent state resets) ──
 
@@ -63,41 +55,7 @@ const NavItem = ({ href, icon, label, pathname, isOpen }: NavItemProps) => {
   );
 };
 
-interface GameNavItemProps extends GameZone {
-  pathname: string;
-  isOpen: boolean;
-}
 
-const GameNavItem = ({ href, icon, label, zone, pathname, isOpen }: GameNavItemProps) => {
-  const isActive = pathname === href;
-  return (
-    <Link
-      href={href}
-      title={!isOpen ? label : undefined}
-      className={`group relative flex items-center gap-2.5 pl-9 pr-3 py-2 rounded-sm text-[13px] font-medium transition-all duration-200 ${isActive
-        ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
-        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
-        }`}
-    >
-      {icon && (
-        <span className={`material-symbols-outlined text-[16px] shrink-0 ${isActive ? 'text-indigo-500' : 'text-slate-400 group-hover:text-slate-600'}`}>
-          {icon}
-        </span>
-      )}
-      <span className={`whitespace-nowrap flex-1 truncate block ${isOpen ? 'md:block' : 'md:hidden'}`}>
-        {label}
-      </span>
-      {zone && (
-        <span className={`text-[9px] font-bold font-mono px-1.5 py-0.5 rounded-sm tracking-wider shrink-0 ${isOpen ? 'md:inline-flex' : 'md:hidden'} ${isActive
-          ? 'bg-indigo-100 text-indigo-500 border border-indigo-200'
-          : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-500 border border-slate-200'
-          }`}>
-          {zone}
-        </span>
-      )}
-    </Link>
-  );
-};
 
 // ── Main Component ───────────────────────────────────────────────────
 
@@ -109,15 +67,7 @@ export default function Sidebar() {
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
 
-  const isGameRouteActive = gameServerItems.some((item) => pathname === item.href);
-  const [gamesOpen, setGamesOpen] = useState(isGameRouteActive);
 
-  // Sync dropdown open state when navigating to a game route
-  useEffect(() => {
-    if (isGameRouteActive) {
-      setGamesOpen(true);
-    }
-  }, [isGameRouteActive]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -211,14 +161,7 @@ export default function Sidebar() {
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
           <button
-            onClick={() => {
-              if (isOpen && gamesOpen) {
-                setGamesOpen(false);
-                setTimeout(() => setIsOpen(false), 300);
-              } else {
-                setIsOpen(!isOpen);
-              }
-            }}
+            onClick={() => setIsOpen(!isOpen)}
             className="hidden md:block p-1.5 rounded-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
             aria-label="Toggle sidebar"
             aria-expanded={isOpen}
@@ -243,54 +186,7 @@ export default function Sidebar() {
               {adminNav.map((item) => (
                 <NavItem key={item.href} {...item} pathname={pathname} isOpen={isOpen} />
               ))}
-              <div className="mt-1">
-                <button
-                  onClick={() => {
-                    if (!isOpen) {
-                      setIsOpen(true);
-                      setTimeout(() => setGamesOpen(true), 300);
-                    } else {
-                      setGamesOpen(!gamesOpen);
-                    }
-                  }}
-                  title={!isOpen ? 'Games Server' : undefined}
-                  aria-expanded={gamesOpen}
-                  aria-controls={GAMES_DROPDOWN_ID}
-                  className={`w-full group relative flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium transition-colors ${isGameRouteActive
-                    ? 'bg-indigo-50/60 text-indigo-600'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
-                    }`}
-                >
-                  <span className={`material-symbols-outlined text-lg shrink-0 ${isGameRouteActive ? 'text-indigo-500' : ''}`}>
-                    sports_esports
-                  </span>
-                  <span className={`whitespace-nowrap flex-1 text-left block ${isOpen ? 'md:block' : 'md:hidden'}`}>
-                    Games Server
-                  </span>
-                  {isOpen && (
-                    <span className={`material-symbols-outlined text-[16px] shrink-0 transition-transform duration-300 ${gamesOpen ? 'rotate-180' : 'rotate-0'} ${isGameRouteActive ? 'text-indigo-400' : 'text-slate-400'}`}>
-                      expand_more
-                    </span>
-                  )}
-                  {isGameRouteActive && (
-                    <span className={`absolute right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-indigo-500 ${isOpen ? 'md:hidden' : 'md:block'} hidden`} />
-                  )}
-                </button>
-                <div
-                  id={GAMES_DROPDOWN_ID}
-                  role="region"
-                  className="grid transition-all duration-300 ease-in-out"
-                  style={{ gridTemplateRows: gamesOpen ? '1fr' : '0fr', opacity: gamesOpen ? 1 : 0 }}
-                >
-                  <div className="overflow-hidden">
-                    <div className="pt-1 pb-1 space-y-0.5">
-                      {gameServerItems.map((item) => (
-                        <GameNavItem key={item.href} {...item} pathname={pathname} isOpen={isOpen} />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+
             </>
           )}
         </nav>
