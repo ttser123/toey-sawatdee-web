@@ -516,7 +516,7 @@ export default function BlastRadiusGraph() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row w-full relative overflow-hidden items-stretch bg-dot-pattern">
+      <div className="flex flex-col lg:flex-row w-full relative overflow-hidden items-stretch bg-blueprint">
         
         <div className="w-full lg:flex-1 relative" style={{ height: isMobile ? '360px' : '550px' }}>
           {/* Mobile hint: ReactFlow requires touch gestures */}

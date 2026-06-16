@@ -1,28 +1,74 @@
-import { Project, SyntaxKind } from "ts-morph";
 import { NextResponse } from "next/server";
 import { EnvNodeData } from "@/lib/env-tracker-types";
 import path from "path";
+import fs from "fs";
 
-// Force dynamic to prevent build-time pre-rendering of server-side AST scan
+// Force dynamic to prevent build-time pre-rendering
 export const dynamic = 'force-dynamic';
 
-// CONFIG: Enterprise-grade speed optimization to prevent Node.js Event Loop blocking
-const AST_SPEED_CONFIG = {
-  skipLoadingLibFiles: true, // Crucial: skip loading massive ts standard libs
-  skipAddingFilesFromTsConfig: true,
-  compilerOptions: {
-    skipLibCheck: true,
-    noResolve: true // Prevent crawling node_modules
-  }
-};
-
-// THE MASTERPIECE CACHE: Global In-Memory Cache to prevent redundant synchronous AST parsing
+// Global In-Memory Cache to prevent redundant parsing
 let GLOBAL_WORKSPACE_ENV_CACHE: EnvNodeData[] | null = null;
+
+function getAllFiles(dirPath: string): string[] {
+  const files: string[] = [];
+  if (!fs.existsSync(dirPath)) return files;
+  
+  function recurse(currentDir: string) {
+    const list = fs.readdirSync(currentDir, { withFileTypes: true });
+    for (const entry of list) {
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        recurse(fullPath);
+      } else if (entry.isFile() && /\.(ts|tsx|js)$/.test(entry.name)) {
+        files.push(fullPath);
+      }
+    }
+  }
+  
+  recurse(dirPath);
+  return files;
+}
+
+function scanFileContent(filePath: string, content: string, envMap: Map<string, EnvNodeData>, relativeToCwd: boolean = true) {
+  const lines = content.split(/\r?\n/);
+  const displayPath = relativeToCwd ? path.relative(process.cwd(), filePath).replace(/\\/g, '/') : filePath;
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    // Ignore lines that are comments
+    if (trimmed.startsWith('//') || trimmed.startsWith('*')) {
+      return;
+    }
+
+    const envRegex = /process\.env\.([a-zA-Z_][a-zA-Z0-9_]*)|\bprocess\.env\[['"]([a-zA-Z_][a-zA-Z0-9_]*)['"]\]/g;
+    let match;
+    while ((match = envRegex.exec(line)) !== null) {
+      const keyName = match[1] || match[2];
+      if (!keyName) continue;
+
+      const lineNumber = index + 1;
+      const codeSnippet = trimmed;
+
+      if (!envMap.has(keyName)) {
+        envMap.set(keyName, {
+          id: `env-${keyName}`,
+          keyName,
+          totalUsages: 0,
+          dependencies: []
+        });
+      }
+
+      const envData = envMap.get(keyName)!;
+      envData.totalUsages += 1;
+      envData.dependencies.push({ filePath: displayPath, lineNumber, codeSnippet });
+    }
+  });
+}
 
 // GET: Isomorphic Hydration (Server scans demo-workspace for default telemetry)
 export async function GET() {
   try {
-    // FAST PATH: Return cached payload instantly if available (0ms Event Loop block)
+    // FAST PATH: Return cached payload instantly if available
     if (GLOBAL_WORKSPACE_ENV_CACHE !== null) {
       console.log("=> [Server Cache] HIT: SERVING_WORKSPACE_TELEMETRY_INSTANTLY");
       return NextResponse.json(GLOBAL_WORKSPACE_ENV_CACHE);
@@ -30,127 +76,53 @@ export async function GET() {
 
     console.log("=> [Server Cache] MISS: INITIALIZING_FIRST_TIME_AST_SCAN");
 
-    // HIGH-PERFORMANCE INSTANTIATION
-    const project = new Project(AST_SPEED_CONFIG);
     const envMap = new Map<string, EnvNodeData>();
+    const demoDir = path.join(process.cwd(), 'demo-workspace');
+    const files = getAllFiles(demoDir);
 
-    // Always scan demo-workspace in both dev and production
-    // The demo-workspace contains curated sample files for the visualization
-    const targetPath = path.join(process.cwd(), 'demo-workspace', '**/*.{ts,tsx,js}');
-
-    project.addSourceFilesAtPaths(targetPath);
-
-    // Common traversal logic (Synchronous & CPU Intensive)
-    project.getSourceFiles().forEach((sourceFile) => {
-      const filePath = sourceFile.getFilePath();
-      
+    files.forEach((filePath) => {
       // 🛡️ Cross-platform blacklisting shield
-      const isExhausted = /node_modules[\\/]|PASSWORD[\\/]|\.next[\\/]|\.git[\\/]/.test(filePath);
+      const isExhausted = /node_modules[\\/]|\.next[\\/]|\.git[\\/]/.test(filePath);
       if (isExhausted) return;
 
-      const propertyAccesses = sourceFile.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression);
-
-      propertyAccesses.forEach((node) => {
-        const expression = node.getExpression().getText();
-        
-        if (expression === "process.env") {
-          const keyName = node.getName();
-          // Normalize display path
-          const displayPath = path.relative(process.cwd(), filePath).replace(/\\/g, '/'); 
-          const lineNumber = sourceFile.getLineAndColumnAtPos(node.getStart()).line;
-          
-          const codeSnippet = node.getFirstAncestorByKind(SyntaxKind.ExpressionStatement)?.getText() 
-                           || node.getParent()?.getText() 
-                           || node.getText();
-
-          if (!envMap.has(keyName)) {
-            envMap.set(keyName, { 
-              id: `env-${keyName}`, 
-              keyName, 
-              totalUsages: 0, 
-              dependencies: [] 
-            });
-          }
-
-          const envData = envMap.get(keyName)!;
-          envData.totalUsages += 1;
-          envData.dependencies.push({ filePath: displayPath, lineNumber, codeSnippet });
-        }
-      });
+      try {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        scanFileContent(filePath, content, envMap, true);
+      } catch (err) {
+        console.error(`Failed to read/scan file ${filePath}:`, err);
+      }
     });
 
-    // 2. 🔥 CACHE MISS RESOLVED: Store the heavy computation result in RAM permanently
     GLOBAL_WORKSPACE_ENV_CACHE = Array.from(envMap.values());
-    
     return NextResponse.json(GLOBAL_WORKSPACE_ENV_CACHE);
 
   } catch (error: any) {
-    console.error('Initial AST Scan Failed:', error);
+    console.error('Initial Environment Scan Failed:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-// 🌟 POST: No-Code Drag-and-Drop (In-Memory Virtual File System)
+// POST: Drag-and-Drop Virtual File System Scan
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { files } = body; 
+    const { files } = body;
 
-    // 🛠️ IN-MEMORY INSTANTIATION + SPEED CONFIG
-    const project = new Project({ 
-      ...AST_SPEED_CONFIG,
-      useInMemoryFileSystem: true 
-    });
-    
     const envMap = new Map<string, EnvNodeData>();
 
-    // Inject all files into the RAM-based Virtual System
     Object.entries(files).forEach(([filePath, fileContent]) => {
-      // 🛡️ Defensive Programming: Double check to prevent RAM explosion
-      const isExhausted = /node_modules[\\/]|PASSWORD[\\/]|\.next[\\/]|\.git[\\/]/.test(filePath);
+      const isExhausted = /node_modules[\\/]|\.next[\\/]|\.git[\\/]/.test(filePath);
       if (!isExhausted) {
-        project.createSourceFile(filePath, fileContent as string);
+        const cleanPath = filePath.replace(/^\//, '');
+        scanFileContent(cleanPath, fileContent as string, envMap, false);
       }
-    });
-
-    // Traverse and analyze exactly as before, but operating at light-speed in memory
-    project.getSourceFiles().forEach((sourceFile) => {
-      const propertyAccesses = sourceFile.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression);
-
-      propertyAccesses.forEach((node) => {
-        const expression = node.getExpression().getText();
-        
-        if (expression === "process.env") {
-          const keyName = node.getName();
-          // Virtual paths have a leading slash, clean it for UI consistency
-          const filePath = sourceFile.getFilePath().replace(/^\//, ''); 
-          const lineNumber = sourceFile.getLineAndColumnAtPos(node.getStart()).line;
-          
-          const codeSnippet = node.getFirstAncestorByKind(SyntaxKind.ExpressionStatement)?.getText() 
-                           || node.getParent()?.getText() 
-                           || node.getText();
-
-          if (!envMap.has(keyName)) {
-            envMap.set(keyName, { 
-              id: `env-${keyName}`, 
-              keyName, 
-              totalUsages: 0, 
-              dependencies: [] 
-            });
-          }
-
-          const envData = envMap.get(keyName)!;
-          envData.totalUsages += 1;
-          envData.dependencies.push({ filePath, lineNumber, codeSnippet });
-        }
-      });
     });
 
     const result: EnvNodeData[] = Array.from(envMap.values());
     return NextResponse.json(result);
 
   } catch (error: any) {
-    console.error('In-Memory AST Scan Failed:', error);
+    console.error('Environment Scan Failed:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

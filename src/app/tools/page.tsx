@@ -18,9 +18,9 @@ export default function ToolsDirectory() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <Link 
                         href="/tools/subnet-solver"
-                        className="group bg-white border border-slate-200 p-6 rounded-sm hover:border-indigo-300 hover:shadow-md transition-all flex flex-col gap-4"
+                        className="group card-blueprint p-6 hover:border-indigo-300 transition-all flex flex-col gap-4"
                     >
-                        <div className="w-10 h-10 bg-slate-50 rounded-sm flex items-center justify-center border border-slate-100 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
+                        <div className="w-10 h-10 bg-slate-50/50 rounded-sm flex items-center justify-center border border-slate-200 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
                             <span className="material-symbols-outlined text-slate-400 group-hover:text-indigo-500">router</span>
                         </div>
                         <div>
@@ -35,9 +35,9 @@ export default function ToolsDirectory() {
 
                     <Link 
                         href="/tools/env-tracker"
-                        className="group bg-white border border-slate-200 p-6 rounded-sm hover:border-indigo-300 hover:shadow-md transition-all flex flex-col gap-4"
+                        className="group card-blueprint p-6 hover:border-indigo-300 transition-all flex flex-col gap-4"
                     >
-                        <div className="w-10 h-10 bg-slate-50 rounded-sm flex items-center justify-center border border-slate-100 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
+                        <div className="w-10 h-10 bg-slate-50/50 rounded-sm flex items-center justify-center border border-slate-200 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
                             <span className="material-symbols-outlined text-slate-400 group-hover:text-indigo-500">hub</span>
                         </div>
                         <div>
@@ -64,9 +64,9 @@ export default function ToolsDirectory() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <Link 
                         href="/tools/my-savings"
-                        className="group bg-white/60 opacity-60 grayscale-[0.5] border border-slate-200 p-6 rounded-sm hover:opacity-100 hover:grayscale-0 hover:border-amber-300 hover:shadow-md transition-all flex flex-col gap-4"
+                        className="group card-blueprint bg-white/60 opacity-60 grayscale-[0.5] p-6 hover:opacity-100 hover:grayscale-0 hover:border-amber-300 transition-all flex flex-col gap-4"
                     >
-                        <div className="w-10 h-10 bg-slate-50 rounded-sm flex items-center justify-center border border-slate-100 group-hover:bg-amber-50 group-hover:border-amber-100 transition-colors">
+                        <div className="w-10 h-10 bg-slate-50/50 rounded-sm flex items-center justify-center border border-slate-200 group-hover:bg-amber-50 group-hover:border-amber-100 transition-colors">
                             <span className="material-symbols-outlined text-slate-400 group-hover:text-amber-600">account_balance</span>
                         </div>
                         <div>

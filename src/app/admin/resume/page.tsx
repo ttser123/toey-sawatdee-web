@@ -95,7 +95,7 @@ export default function ResumeAdminPage() {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="card-blueprint p-8 bg-white space-y-8 relative overflow-hidden">
           {/* Blueprint Grid Background */}
-          <div className="absolute inset-0 bg-dot-pattern opacity-5 pointer-events-none" />
+          <div className="absolute inset-0 bg-blueprint opacity-5 pointer-events-none" />
           
           <div className="relative z-10 space-y-6">
             <div className="space-y-2 border-l-4 border-indigo-500 pl-4">

@@ -47,18 +47,47 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Blueprint Engineering Colors */
-  --color-papaya-whip-900: #fffcf6;
-  --color-papaya-whip-800: #fef9ed;
-  --color-papaya-whip-500: #fdf0d5;
-  --color-deep-space-blue-100: #00090e;
-  --color-deep-space-blue-200: #001220;
-  --color-deep-space-blue-300: #001c2b;
-  --color-deep-space-blue-500: #003049;
-  --color-steel-blue-900: #e1ebf2;
-  --color-steel-blue-700: #a4c3d7;
-  --color-steel-blue-600: #85afc9;
-  --color-steel-blue-500: #669bbc;
+  /* Thinner Font Weight Scale Override */
+  --font-weight-normal: 300;
+  --font-weight-medium: 400;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 600;
+  --font-weight-extrabold: 700;
+  --font-weight-black: 800;
+
+  /* Standard Tailwind Colors Override to Earth Tone Palette */
+  --color-slate-50: #fffef9; /* cornsilk-900 */
+  --color-slate-100: #fffdf3; /* cornsilk-800 */
+  --color-slate-200: #fefced; /* cornsilk-700 */
+  --color-slate-300: #c5d0a3; /* olive_leaf-800 */
+  --color-slate-400: #a9b876; /* olive_leaf-700 */
+  --color-slate-500: #606c38; /* olive_leaf-500 / DEFAULT */
+  --color-slate-600: #4c562c; /* olive_leaf-400 */
+  --color-slate-700: #394121; /* olive_leaf-300 */
+  --color-slate-800: #101509; /* black_forest-200 */
+  --color-slate-900: #080b05; /* black_forest-100 */
+
+  --color-indigo-50: #f6e1cf; /* copperwood-900 */
+  --color-indigo-100: #ecc3a0; /* copperwood-800 */
+  --color-indigo-200: #e3a570; /* copperwood-700 */
+  --color-indigo-300: #d98840; /* copperwood-600 */
+  --color-indigo-400: #bc6c25; /* copperwood-500 */
+  --color-indigo-500: #96561e; /* copperwood-400 */
+  --color-indigo-600: #bc6c25; /* copperwood DEFAULT */
+  --color-indigo-700: #704016; /* copperwood-300 */
+
+  /* Blueprint Engineering Colors mapped to Earth Tone equivalents */
+  --color-papaya-whip-900: #fffef9; /* cornsilk-900 */
+  --color-papaya-whip-800: #fffdf3; /* cornsilk-800 */
+  --color-papaya-whip-500: #fefae0; /* cornsilk DEFAULT */
+  --color-deep-space-blue-100: #101509; /* black_forest-200 */
+  --color-deep-space-blue-200: #18200e; /* black_forest-300 */
+  --color-deep-space-blue-300: #1f2a13; /* black_forest-400 */
+  --color-deep-space-blue-500: #283618; /* black_forest DEFAULT */
+  --color-steel-blue-900: #f4f6ef; /* cleaner, lighter olive_leaf-900 */
+  --color-steel-blue-700: #c5d0a3; /* olive_leaf-800 */
+  --color-steel-blue-600: #a9b876; /* olive_leaf-700 */
+  --color-steel-blue-500: #606c38; /* olive_leaf DEFAULT */
   --color-brick-red-600: #eb2330;
   --color-brick-red-500: #c1121f;
   --color-brick-red-400: #990e17;
@@ -151,6 +180,7 @@ input[type=number] {
   }
   body {
     @apply bg-background text-foreground;
+    font-weight: 300;
   }
   html {
     @apply font-sans;
@@ -161,10 +191,7 @@ input[type=number] {
 
 /* 1. Graph-paper grid background */
 .bg-blueprint {
-  background-color: #fffcf6; /* papaya_whip 900 */
-  background-image: linear-gradient(to right, #e1ebf2 1px, transparent 1px), /* steel_blue 900 */
-                    linear-gradient(to bottom, #e1ebf2 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: var(--color-papaya-whip-900);
 }
 
 /* 5. Tracing-paper translucent card */
@@ -172,7 +199,7 @@ input[type=number] {
   background-color: rgba(255, 255, 255, 0.80);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  border: 4px double #001c2b; /* deep_space_blue 300 double border */
+  border: 1px solid #cbd5e1; /* thin solid border in slate-300 */
   border-radius: 2px; /* sharp edges */
 }
 
@@ -239,7 +266,7 @@ input[type=number] {
 
 /* สร้างแพทเทิร์นจุดสีเทาอ่อน (slate-200) ระยะห่าง 24px */
 .bg-dot-pattern {
-  background-image: radial-gradient(#e1ebf2 1px, transparent 1px); /* steel_blue 900 */
+  background-image: radial-gradient(var(--color-steel-blue-900) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 

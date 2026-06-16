@@ -75,11 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
             </head>
-            <body className="relative min-h-screen bg-papaya-whip-900 text-deep-space-blue-100 font-sans">
-                {/* 🌌 LAYER 1: Background Dots (อยู่หลังสุด) */}
-                <div className="absolute inset-0 z-0 bg-dot-pattern mask-fade-out pointer-events-none"></div>
-                
-                {/* 📄 LAYER 2: Content (ลอยอยู่เหนือจุด) */}
+            <body className="relative min-h-screen bg-blueprint text-deep-space-blue-100 font-sans">
                 <div className="relative z-10">
                     <ClientLayout>{children}</ClientLayout>
                 </div>

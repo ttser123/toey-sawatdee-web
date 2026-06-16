@@ -10,7 +10,7 @@ import { FaGithub, FaLinkedin, FaEnvelope, FaYoutube } from 'react-icons/fa';
 // ── Navigation Data ──────────────────────────────────────────────────
 
 const topNav = [
-  { href: '/', icon: 'person', label: 'Portfolio' },
+  { href: '/', icon: 'person', label: 'Portfolio Website' },
   { href: '/overview', icon: 'bar_chart', label: 'Overview' },
 ];
 
@@ -46,7 +46,7 @@ const NavItem = ({ href, icon, label, pathname, isOpen }: NavItemProps) => {
       title={!isOpen ? label : undefined}
       className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium transition-colors ${isActive
         ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
-        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
+        : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
         }`}
     >
       <span className="material-symbols-outlined text-lg shrink-0">{icon}</span>
@@ -60,7 +60,7 @@ const NavItem = ({ href, icon, label, pathname, isOpen }: NavItemProps) => {
 // ── Main Component ───────────────────────────────────────────────────
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+  const isOpen = true;
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [visitorCount, setVisitorCount] = useState<number | string>('...');
   const pathname = usePathname();
@@ -122,11 +122,11 @@ export default function Sidebar() {
 
   return (
     <>
-      <header className="md:hidden flex items-center justify-between bg-white/90 backdrop-blur-sm border-b border-slate-200 h-14 px-4 shrink-0">
-        <span className="font-semibold text-slate-800 text-sm">Portfolio</span>
+      <header className="md:hidden flex items-center justify-between bg-slate-100/90 backdrop-blur-sm border-b border-slate-200 h-14 px-4 shrink-0">
+        <span className="font-semibold text-slate-800 text-sm">Portfolio Website</span>
         <button
           onClick={() => setIsMobileOpen(true)}
-          className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-sm"
+          className="p-1.5 text-slate-500 hover:bg-slate-200 rounded-sm"
           aria-label="Open navigation menu"
         >
           <span className="material-symbols-outlined">menu</span>
@@ -143,30 +143,22 @@ export default function Sidebar() {
 
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 bg-white/95 backdrop-blur-sm border-r border-slate-200 flex flex-col shrink-0 transition-all duration-300 overflow-x-hidden
+          fixed inset-y-0 left-0 z-50 bg-slate-100/95 backdrop-blur-sm border-r border-slate-200 flex flex-col shrink-0 transition-all duration-300 overflow-x-hidden
           md:relative md:translate-x-0
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-          w-64 ${isOpen ? 'md:w-60' : 'md:w-[60px]'}
+          w-64 md:w-60
         `}
         role="navigation"
         aria-label="Main navigation"
       >
         <div className="h-14 flex items-center justify-between px-3 border-b border-slate-200">
-          <span className={`font-semibold text-slate-800 text-sm whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>Portfolio</span>
+          <span className="font-semibold text-slate-800 text-sm whitespace-nowrap block">Portfolio Website</span>
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="md:hidden p-1.5 rounded-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="md:hidden p-1.5 rounded-sm text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
             aria-label="Close navigation menu"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
-          </button>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="hidden md:block p-1.5 rounded-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
-            aria-label="Toggle sidebar"
-            aria-expanded={isOpen}
-          >
-            <span className="material-symbols-outlined text-[20px]">{isOpen ? 'menu_open' : 'menu'}</span>
           </button>
         </div>
 
@@ -195,13 +187,13 @@ export default function Sidebar() {
           <div className={`flex flex-col px-3 py-2 mb-1 ${isOpen ? 'md:flex' : 'md:hidden'}`}>
             <h3 className="text-[11px] text-slate-400 uppercase tracking-wider font-medium font-mono mb-3">My Contact</h3>
             <div className="flex items-center gap-4 mb-3">
-              <a href="https://github.com/ttser123" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-800 transition-colors" title="GitHub">
+              <a href="https://github.com/ttser123" target="_blank" rel="noopener noreferrer" className="text-slate-800 hover:text-slate-600 transition-colors" title="GitHub">
                 <FaGithub className="text-[20px]" />
               </a>
-              <a href="https://www.linkedin.com/in/parinya-sawatdee" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-indigo-600 transition-colors" title="LinkedIn">
+              <a href="https://www.linkedin.com/in/parinya-sawatdee" target="_blank" rel="noopener noreferrer" className="text-[#0a66c2] hover:text-[#0a66c2]/80 transition-colors" title="LinkedIn">
                 <FaLinkedin className="text-[20px]" />
               </a>
-              <a href="https://www.youtube.com/@toeysawatdee" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-rose-600 transition-colors" title="YouTube">
+              <a href="https://www.youtube.com/@toeysawatdee" target="_blank" rel="noopener noreferrer" className="text-rose-600 hover:text-rose-500 transition-colors" title="YouTube">
                 <FaYoutube className="text-[20px]" />
               </a>
             </div>
