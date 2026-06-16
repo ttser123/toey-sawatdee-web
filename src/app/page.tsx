@@ -15,8 +15,8 @@ import { ProjectShowcase } from '@/components/portfolio/ProjectShowcase';
 
 const STATIC_HERO: HeroSection = {
   name: "Parinya Sawatdee",
-  nickname: "Toey",
-  headline: "Motivated Software Engineer with a solid foundation in AWS and Next.js. Eager to tackle real-world infrastructure challenges and scale alongside a high-performing team.",
+  nickname: "Toey", 
+  headline: "",
   availability: "Available for Opportunities",
   resumeUrl: "/resume"
 };

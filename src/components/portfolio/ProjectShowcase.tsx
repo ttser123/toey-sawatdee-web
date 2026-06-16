@@ -1,7 +1,5 @@
-// src/components/portfolio/ProjectShowcase.tsx
-'use client';
-
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { FaGithub } from 'react-icons/fa';
 import { PROJECTS_DATA, type ProjectItem } from '@/data/projects';
@@ -9,6 +7,11 @@ import { PROJECTS_DATA, type ProjectItem } from '@/data/projects';
 // ── UI Component ───────────────────────────────────────────────────
 export function ProjectShowcase() {
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // ล็อค Scroll หน้าจอเวลาเปิด Modal
   useEffect(() => {
@@ -120,9 +123,15 @@ export function ProjectShowcase() {
       </div>
 
       {/* ── 4. Case Study Modal (Rich Text Render Engine) ── */}
-      {selectedProject && selectedProject.details && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-5xl max-h-[90vh] flex flex-col border border-slate-300 shadow-2xl relative animate-in zoom-in-95 duration-200 rounded-sm">
+      {selectedProject && selectedProject.details && mounted && createPortal(
+        <div 
+          onClick={() => setSelectedProject(null)}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+        >
+          <div 
+            onClick={e => e.stopPropagation()}
+            className="bg-white w-full max-w-5xl max-h-[90vh] flex flex-col border border-slate-300 shadow-2xl relative animate-in zoom-in-95 duration-200 rounded-sm"
+          >
             
             {/* ── Modal Header ── */}
             <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-slate-50 shrink-0">
@@ -193,7 +202,8 @@ export function ProjectShowcase() {
 
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

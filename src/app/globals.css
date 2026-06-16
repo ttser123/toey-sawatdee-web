@@ -6,9 +6,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: "Google Sans Flex", "Roboto", sans-serif;
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-serif: "Playfair Display", serif;
+  --font-heading: "Playfair Display", serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -45,6 +46,23 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Blueprint Engineering Colors */
+  --color-papaya-whip-900: #fffcf6;
+  --color-papaya-whip-800: #fef9ed;
+  --color-papaya-whip-500: #fdf0d5;
+  --color-deep-space-blue-100: #00090e;
+  --color-deep-space-blue-200: #001220;
+  --color-deep-space-blue-300: #001c2b;
+  --color-deep-space-blue-500: #003049;
+  --color-steel-blue-900: #e1ebf2;
+  --color-steel-blue-700: #a4c3d7;
+  --color-steel-blue-600: #85afc9;
+  --color-steel-blue-500: #669bbc;
+  --color-brick-red-600: #eb2330;
+  --color-brick-red-500: #c1121f;
+  --color-brick-red-400: #990e17;
+  --color-molten-lava-700: #ff1616;
 }
 
 :root {
@@ -143,9 +161,9 @@ input[type=number] {
 
 /* 1. Graph-paper grid background */
 .bg-blueprint {
-  background-color: #f8fafc; /* slate-50 */
-  background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
-                    linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+  background-color: #fffcf6; /* papaya_whip 900 */
+  background-image: linear-gradient(to right, #e1ebf2 1px, transparent 1px), /* steel_blue 900 */
+                    linear-gradient(to bottom, #e1ebf2 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -154,7 +172,7 @@ input[type=number] {
   background-color: rgba(255, 255, 255, 0.80);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  border: 1px solid #cbd5e1; /* slate-300 */
+  border: 4px double #001c2b; /* deep_space_blue 300 double border */
   border-radius: 2px; /* sharp edges */
 }
 
@@ -221,7 +239,7 @@ input[type=number] {
 
 /* สร้างแพทเทิร์นจุดสีเทาอ่อน (slate-200) ระยะห่าง 24px */
 .bg-dot-pattern {
-  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-image: radial-gradient(#e1ebf2 1px, transparent 1px); /* steel_blue 900 */
   background-size: 24px 24px;
 }
 

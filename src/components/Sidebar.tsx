@@ -18,12 +18,12 @@ const topNav = [
 
 const bottomNav = [
   { href: '/tools', icon: 'construction', label: 'Tools' },
-  { href: '/release-notes', icon: 'update', label: 'Release Notes' },
 ];
 
 const adminNav = [
   { href: '/admin/admin-log', icon: 'dns', label: 'Admin Log' },
   { href: '/admin/resume', icon: 'description', label: 'Resume' },
+  { href: '/admin/release-notes', icon: 'update', label: 'Release Notes' },
 ];
 
 

@@ -1,7 +1,5 @@
-// src/components/portfolio/PortfolioComponents.tsx
-'use client';
-
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import dynamic from 'next/dynamic';
 import { FaGithub, FaLinkedin, FaEnvelope, FaYoutube, FaFileAlt } from 'react-icons/fa';
 import { HeroSection, ContactChannel } from '@/lib/portfolio-types';
@@ -58,6 +56,11 @@ export function ResumeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -86,10 +89,10 @@ export function ResumeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-2 md:p-8 animate-in fade-in duration-300" onClick={onClose}>
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-2 md:p-8 animate-in fade-in duration-300" onClick={onClose}>
       <div className="w-full max-w-5xl h-[95vh] md:h-full flex flex-col bg-white border border-slate-700 shadow-2xl relative animate-in zoom-in-95 duration-300 overflow-hidden" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-50 shrink-0">
           <div className="flex items-center gap-3">
@@ -149,7 +152,8 @@ export function ResumeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; border: 2px solid #1e293b; }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
 

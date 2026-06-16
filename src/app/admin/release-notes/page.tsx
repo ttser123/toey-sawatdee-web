@@ -1,4 +1,4 @@
-// src/app/release-notes/page.tsx
+// src/app/admin/release-notes/page.tsx
 'use client';
 
 import ReleaseNotes from '@/components/ReleaseNotes';
@@ -10,4 +10,3 @@ export default function ReleaseNotesPage() {
     </div>
   );
 }
-
