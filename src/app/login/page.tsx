@@ -66,55 +66,55 @@ function LoginForm() {
 
     if (isLoading || isAuthenticated) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-                <span className="material-symbols-outlined animate-spin text-4xl text-blue-600 mb-4">progress_activity</span>
-                <p className="text-gray-500 text-sm">Authenticating...</p>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-blueprint">
+                <span className="material-symbols-outlined animate-spin text-4xl text-indigo-600 mb-4">progress_activity</span>
+                <p className="text-slate-500 font-mono text-sm uppercase tracking-wider">Authenticating...</p>
             </div>
         );
     }
 
     return (
-        <main className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-xl w-full max-w-md p-8 animate-in fade-in zoom-in-95 duration-300">
+        <main className="flex items-center justify-center min-h-screen bg-blueprint p-4">
+            <div className="card-blueprint w-full max-w-md p-8 animate-in fade-in zoom-in-95 duration-300">
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
+                    <h1 className="text-2xl font-bold text-slate-800">Admin Login</h1>
                 </div>
 
                 {errorMsg && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-center gap-3">
-                        <span className="material-symbols-outlined text-red-500 shrink-0">error</span>
+                    <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-600 rounded-sm font-mono text-sm flex items-center gap-3">
+                        <span className="material-symbols-outlined text-rose-500 shrink-0">error</span>
                         <p>{errorMsg}</p>
                     </div>
                 )}
 
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
+                        <label className="block text-sm font-bold font-mono text-slate-800 mb-1.5 uppercase tracking-wide">Email Address</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-sm text-slate-800 font-mono text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-none"
                             placeholder="admin@example.com"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                        <label className="block text-sm font-bold font-mono text-slate-800 mb-1.5 uppercase tracking-wide">Password</label>
                         <div className="relative">
                             <input
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-4 pr-12 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                className="w-full pl-4 pr-12 py-2.5 bg-slate-50 border border-slate-300 rounded-sm text-slate-800 font-mono text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-none"
                                 placeholder="••••••••"
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-700 transition-colors"
+                                className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-700 transition-colors"
                                 aria-label={showPassword ? "Hide password" : "Show password"}
                             >
                                 <span className="material-symbols-outlined text-[20px]">
@@ -127,7 +127,7 @@ function LoginForm() {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="w-full py-2.5 mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 shadow-sm flex items-center justify-center gap-2"
+                        className="w-full py-2.5 mt-4 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 text-indigo-700 text-sm font-mono font-bold uppercase tracking-wide rounded-sm transition-colors disabled:opacity-50 shadow-none flex items-center justify-center gap-2"
                     >
                         {submitting ? (
                             <>
@@ -135,13 +135,13 @@ function LoginForm() {
                                 <span>Authenticating...</span>
                             </>
                         ) : (
-                            'Sign In to Server Status'
+                            'Sign In to Admin Panel'
                         )}
                     </button>
                 </form>
 
-                <div className="mt-8 text-center border-t border-gray-100 pt-6">
-                    <Link href="/" className="text-sm text-gray-500 hover:text-gray-900 flex items-center justify-center gap-1.5 transition-colors">
+                <div className="mt-8 text-center border-t border-slate-200 pt-6">
+                    <Link href="/" className="text-sm font-mono text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1.5 transition-colors">
                         <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                         Back
                     </Link>
@@ -154,8 +154,8 @@ function LoginForm() {
 export default function LoginPage() {
     return (
         <Suspense fallback={
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <span className="material-symbols-outlined animate-spin text-4xl text-blue-600">progress_activity</span>
+            <div className="flex items-center justify-center min-h-screen bg-blueprint">
+                <span className="material-symbols-outlined animate-spin text-4xl text-indigo-600">progress_activity</span>
             </div>
         }>
             <LoginForm />
