@@ -331,3 +331,62 @@ input[type=number] {
   animation-duration: 500ms;
 }
 
+/* ── Scroll-Reveal Animation System ──────────────────────────────── */
+/* Elements start invisible/offset, animate in when .scroll-revealed is added by IntersectionObserver */
+
+.scroll-reveal {
+  will-change: opacity, transform;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Initial hidden states per variant ── */
+.scroll-reveal--fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+.scroll-reveal--fade-down {
+  opacity: 0;
+  transform: translateY(-28px);
+}
+
+.scroll-reveal--fade-left {
+  opacity: 0;
+  transform: translateX(-28px);
+}
+
+.scroll-reveal--fade-right {
+  opacity: 0;
+  transform: translateX(28px);
+}
+
+.scroll-reveal--scale-in {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+.scroll-reveal--fade-in {
+  opacity: 0;
+  transform: none;
+}
+
+/* ── Revealed state (shared) ── */
+.scroll-revealed.scroll-reveal--fade-up,
+.scroll-revealed.scroll-reveal--fade-down,
+.scroll-revealed.scroll-reveal--fade-left,
+.scroll-revealed.scroll-reveal--fade-right,
+.scroll-revealed.scroll-reveal--scale-in,
+.scroll-revealed.scroll-reveal--fade-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Accessibility: disable motion for users who prefer it ── */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}

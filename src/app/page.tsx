@@ -10,6 +10,7 @@ import {
   type ContactChannel 
 } from '@/components/portfolio/PortfolioComponents';
 import { ProjectShowcase } from '@/components/portfolio/ProjectShowcase';
+import { ScrollReveal } from '@/components/ScrollReveal';
 
 // ── Static Data ──────────────────────────────────────────────────────
 
@@ -37,17 +38,23 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-[70vh] justify-center space-y-16 py-12">
-      <PortfolioHero 
-        data={STATIC_HERO} 
-        onViewResume={openResume} 
-      />
+      <ScrollReveal variant="fade-down">
+        <PortfolioHero 
+          data={STATIC_HERO} 
+          onViewResume={openResume} 
+        />
+      </ScrollReveal>
 
-      <ProjectShowcase />
+      <ScrollReveal variant="scale-in">
+        <ProjectShowcase />
+      </ScrollReveal>
 
-      <ContactSection 
-        contacts={STATIC_CONTACTS} 
-        onViewResume={openResume}
-      />
+      <ScrollReveal variant="fade-up">
+        <ContactSection 
+          contacts={STATIC_CONTACTS} 
+          onViewResume={openResume}
+        />
+      </ScrollReveal>
 
       <ResumeModal 
         isOpen={isResumeOpen} 
