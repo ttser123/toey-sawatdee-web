@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { 
   PortfolioHero, 
   ContactSection, 
-  ResumeModal, 
+  ResumeModal,
   type HeroSection, 
   type ContactChannel 
 } from '@/components/portfolio/PortfolioComponents';

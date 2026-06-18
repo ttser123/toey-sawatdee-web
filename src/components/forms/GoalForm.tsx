@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useFinanceStore } from '@/lib/finance-store';
 import { formatCurrency, formatMonth } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export const GoalForm = () => {
   const store = useFinanceStore();
@@ -12,6 +14,7 @@ export const GoalForm = () => {
     deadline: store.viewMonth,
     assetId: ''
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,10 +31,11 @@ export const GoalForm = () => {
   const handleSaveEdit = () => {
     if (!editDraft.id) return;
     const cleanLabel = editDraft.label.trim();
-    if (!cleanLabel) return alert("Error: Label cannot be empty.");
+    if (!cleanLabel) { setError("Error: Label cannot be empty."); return; }
     const parsedAmount = parseFloat(editDraft.target);
-    if (isNaN(parsedAmount)) return alert("Error: Invalid target amount.");
+    if (isNaN(parsedAmount)) { setError("Error: Invalid target amount."); return; }
 
+    setError(null);
     store.updateGoal(editDraft.id, {
       label: cleanLabel,
       targetAmount: parsedAmount,
@@ -52,6 +56,16 @@ export const GoalForm = () => {
           </h3>
           <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase font-mono">Total_Missions: {store.goals.length}</span>
         </div>
+
+        {error && (
+          <Alert variant="destructive" className="rounded-sm border-rose-500 bg-rose-50 mb-4">
+            <span className="material-symbols-outlined h-4 w-4">error</span>
+            <AlertTitle className="font-black font-mono uppercase tracking-widest text-rose-800">Validation Error</AlertTitle>
+            <AlertDescription className="font-mono text-xs text-rose-600 font-bold">
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
           <table className="w-full text-left font-mono text-[10px] sm:text-[11px] min-w-[550px]">
@@ -125,12 +139,39 @@ export const GoalForm = () => {
                           {editDraft.id === goal.id ? (
                             <>
                               <button onClick={handleSaveEdit} className="text-emerald-600 hover:text-emerald-700 transition-all"><span className="material-symbols-outlined text-sm font-black">check</span></button>
-                              <button onClick={() => setEditDraft({ id: null, label: '', target: '', deadline: store.viewMonth, assetId: '' })} className="text-slate-400 hover:text-slate-600 transition-all"><span className="material-symbols-outlined text-sm font-black">close</span></button>
+                              <button onClick={() => {
+                                setEditDraft({ id: null, label: '', target: '', deadline: store.viewMonth, assetId: '' });
+                                setError(null);
+                              }} className="text-slate-400 hover:text-slate-600 transition-all"><span className="material-symbols-outlined text-sm font-black">close</span></button>
                             </>
                           ) : (
                             <>
-                              <button onClick={() => setEditDraft({ id: goal.id, label: goal.label, target: goal.targetAmount.toString(), deadline: goal.deadline, assetId: goal.linkedAssetId })} className="text-slate-300 hover:text-indigo-600 transition-all"><span className="material-symbols-outlined text-sm sm:text-base">edit_note</span></button>
-                              <button onClick={() => { if (window.confirm(`Are you sure you want to delete mission "${goal.label}"?`)) store.removeGoal(goal.id); }} className="text-slate-300 hover:text-rose-600 transition-all"><span className="material-symbols-outlined text-sm sm:text-base">delete_forever</span></button>
+                              <button onClick={() => {
+                                setEditDraft({ id: goal.id, label: goal.label, target: goal.targetAmount.toString(), deadline: goal.deadline, assetId: goal.linkedAssetId });
+                                setError(null);
+                              }} className="text-slate-300 hover:text-indigo-600 transition-all"><span className="material-symbols-outlined text-sm sm:text-base">edit_note</span></button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <button className="text-slate-300 hover:text-rose-600 transition-all"><span className="material-symbols-outlined text-sm sm:text-base">delete_forever</span></button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="border-slate-300 shadow-2xl rounded-sm">
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle className="font-mono uppercase font-black tracking-widest text-slate-800">Confirm Deletion</AlertDialogTitle>
+                                    <AlertDialogDescription className="font-mono text-xs text-slate-500">
+                                      Are you sure you want to delete mission <span className="font-bold text-slate-700">"{goal.label}"</span>? This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel className="font-mono text-xs font-black uppercase tracking-widest rounded-sm border-slate-300">Cancel</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                      onClick={() => store.removeGoal(goal.id)}
+                                      className="font-mono text-xs font-black uppercase tracking-widest rounded-sm bg-rose-600 hover:bg-rose-700 text-white shadow-none"
+                                    >
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </>
                           )}
                         </div>

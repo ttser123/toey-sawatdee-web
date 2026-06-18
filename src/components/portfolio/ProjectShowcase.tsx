@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { FaGithub } from 'react-icons/fa';
 import { PROJECTS_DATA, type ProjectItem } from '@/data/projects';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 // ── UI Component ───────────────────────────────────────────────────
 export function ProjectShowcase() {
@@ -12,13 +12,6 @@ export function ProjectShowcase() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // ล็อค Scroll หน้าจอเวลาเปิด Modal
-  useEffect(() => {
-    if (selectedProject) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = 'unset';
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [selectedProject]);
 
   const handleProjectAction = (project: ProjectItem) => {
     if (project.liveUrl) {
@@ -123,30 +116,24 @@ export function ProjectShowcase() {
       </div>
 
       {/* ── 4. Case Study Modal (Rich Text Render Engine) ── */}
-      {selectedProject && selectedProject.details && mounted && createPortal(
-        <div 
-          onClick={() => setSelectedProject(null)}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
-        >
-          <div 
-            onClick={e => e.stopPropagation()}
-            className="bg-white w-full max-w-5xl max-h-[90vh] flex flex-col border border-slate-300 shadow-2xl relative animate-in zoom-in-95 duration-200 rounded-sm"
-          >
+      <Dialog open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
+        {selectedProject && selectedProject.details && mounted && (
+          <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden bg-white border-slate-300 shadow-2xl rounded-sm">
             
             {/* ── Modal Header ── */}
-            <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-slate-50 shrink-0">
+            <DialogHeader className="p-5 border-b border-slate-200 bg-slate-50 shrink-0 text-left">
               <div>
                 <span className="text-[10px] font-black font-mono text-indigo-600 uppercase tracking-wider block mb-1">
                   {"// Engineering Case Study"}
                 </span>
-                <h3 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
+                <DialogTitle className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
                   {selectedProject.title}
-                </h3>
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Case study details for {selectedProject.title}
+                </DialogDescription>
               </div>
-              <button onClick={() => setSelectedProject(null)} className="text-slate-400 hover:text-rose-500 transition-colors bg-slate-200 hover:bg-rose-100 p-2 rounded-full flex items-center justify-center">
-                <span className="material-symbols-outlined text-xl">close</span>
-              </button>
-            </div>
+            </DialogHeader>
 
             {/* ── Modal Article Content ── */}
             <div className="p-6 md:p-10 overflow-y-auto custom-scrollbar flex-1 bg-white">
@@ -199,12 +186,10 @@ export function ProjectShowcase() {
                   </div>
                 ))}
               </div>
-
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </DialogContent>
+        )}
+      </Dialog>
     </div>
   );
 }

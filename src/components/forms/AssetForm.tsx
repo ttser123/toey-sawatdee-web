@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useFinanceStore } from '@/lib/finance-store';
 import { formatCurrency } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export const AssetForm = () => {
   const store = useFinanceStore();
@@ -10,6 +12,7 @@ export const AssetForm = () => {
     label: '',
     amount: ''
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,21 +27,23 @@ export const AssetForm = () => {
     // Gate 1: The Ghost Trap (Empty Label)
     const cleanLabel = editDraft.label.trim();
     if (!cleanLabel) {
-      alert("Error: Asset label cannot be empty.");
+      setError("Error: Asset label cannot be empty.");
       return;
     }
 
     // Gate 2 & 3: The NaN & Negative Asset Traps
     const parsedAmount = parseFloat(editDraft.amount);
     if (isNaN(parsedAmount)) {
-      alert("Error: Invalid amount entered.");
+      setError("Error: Invalid amount entered.");
       return;
     }
 
     if (parsedAmount < 0) {
-      alert("Error: Asset balance cannot be negative. For debts, use the Expense ledger.");
+      setError("Error: Asset balance cannot be negative. For debts, use the Expense ledger.");
       return;
     }
+
+    setError(null);
 
     store.updateAsset(editDraft.id, {
       label: cleanLabel,
@@ -58,6 +63,16 @@ export const AssetForm = () => {
           </h3>
           <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase font-mono">Total_Entries: {store.assets.length}</span>
         </div>
+
+        {error && (
+          <Alert variant="destructive" className="rounded-sm border-rose-500 bg-rose-50 mb-4">
+            <span className="material-symbols-outlined h-4 w-4">error</span>
+            <AlertTitle className="font-black font-mono uppercase tracking-widest text-rose-800">Validation Error</AlertTitle>
+            <AlertDescription className="font-mono text-xs text-rose-600 font-bold">
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
           <table className="w-full text-left font-mono text-[10px] sm:text-[11px] min-w-[400px]">
@@ -113,7 +128,10 @@ export const AssetForm = () => {
                               <span className="material-symbols-outlined text-sm font-black">check</span>
                             </button>
                             <button 
-                              onClick={() => setEditDraft({ id: null, label: '', amount: '' })}
+                              onClick={() => {
+                                setEditDraft({ id: null, label: '', amount: '' });
+                                setError(null);
+                              }}
                               className="text-slate-400 hover:text-slate-600 transition-all"
                               title="Cancel Edit"
                             >
@@ -123,23 +141,43 @@ export const AssetForm = () => {
                         ) : (
                           <>
                             <button 
-                              onClick={() => setEditDraft({ id: a.id, label: a.label, amount: a.amount.toString() })}
+                              onClick={() => {
+                                setEditDraft({ id: a.id, label: a.label, amount: a.amount.toString() });
+                                setError(null);
+                              }}
                               className="text-slate-300 hover:text-indigo-600 transition-all"
                               title="Edit Asset"
                             >
                               <span className="material-symbols-outlined text-sm sm:text-base">edit_note</span>
                             </button>
-                            <button 
-                              onClick={() => {
-                                if (window.confirm(`Are you sure you want to delete asset "${a.label}"? This will affect any linked goals.`)) {
-                                  store.removeAsset(a.id);
-                                }
-                              }} 
-                              className="text-slate-300 hover:text-rose-600 transition-all"
-                              title="Delete Asset"
-                            >
-                              <span className="material-symbols-outlined text-sm sm:text-base">delete_forever</span>
-                            </button>
+                            
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button 
+                                  className="text-slate-300 hover:text-rose-600 transition-all"
+                                  title="Delete Asset"
+                                >
+                                  <span className="material-symbols-outlined text-sm sm:text-base">delete_forever</span>
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="border-slate-300 shadow-2xl rounded-sm">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="font-mono uppercase font-black tracking-widest text-slate-800">Confirm Deletion</AlertDialogTitle>
+                                  <AlertDialogDescription className="font-mono text-xs text-slate-500">
+                                    Are you sure you want to delete asset <span className="font-bold text-slate-700">"{a.label}"</span>? This will affect any linked goals. This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel className="font-mono text-xs font-black uppercase tracking-widest rounded-sm border-slate-300">Cancel</AlertDialogCancel>
+                                  <AlertDialogAction 
+                                    onClick={() => store.removeAsset(a.id)}
+                                    className="font-mono text-xs font-black uppercase tracking-widest rounded-sm bg-rose-600 hover:bg-rose-700 text-white shadow-none"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </>
                         )}
                       </div>

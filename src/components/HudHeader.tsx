@@ -6,7 +6,7 @@ import { useFinanceStore, type CurrencyCode } from '@/lib/finance-store';
 import { formatMonth, getCurrentMonth } from '@/lib/utils';
 
 interface HudHeaderProps {
-  title: string;
+  title: string | React.ReactNode;
   subtitle?: string;
   statusLabel?: string;
   children?: React.ReactNode;

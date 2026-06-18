@@ -4,9 +4,10 @@ import { usePathname } from 'next/navigation';
 import AuthProvider from '@/components/AuthProvider';
 import Sidebar from '@/components/Sidebar';
 import HudHeader from '@/components/HudHeader';
+import { TypingAnimation } from '@/components/ui/typing-animation';
 
 const getPageTitle = (pathname: string) => {
-    if (pathname === '/') return "Hi, I'm Parinya";
+    if (pathname === '/') return <TypingAnimation duration={60} as="span">Hi, I'm Parinya👋</TypingAnimation>;
     if (pathname === '/overview') return 'OVERVIEW';
     if (pathname === '/tools') return 'TOOLS DIRECTORY';
     if (pathname === '/tools/my-savings') return 'MYSAVINGS';
