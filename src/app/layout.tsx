@@ -2,6 +2,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import ClientLayout from '@/components/ClientLayout';
+import { Pointer } from '@/components/ui/pointer';
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://toey-sawatdee.me'),
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
             </head>
             <body className="relative min-h-screen bg-blueprint text-deep-space-blue-100 font-sans">
+                <Pointer />
                 <div className="relative z-10">
                     <ClientLayout>{children}</ClientLayout>
                 </div>

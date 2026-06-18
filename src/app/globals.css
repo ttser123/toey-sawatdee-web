@@ -228,6 +228,14 @@ input[type=number] {
   }
 }
 
+* {
+  cursor: none !important;
+}
+
+.global-hide-cursor, .global-hide-cursor * {
+  cursor: none !important;
+}
+
 /* ── Blueprint Design System ─────────────────────────────────────── */
 
 /* 1. Graph-paper grid background */

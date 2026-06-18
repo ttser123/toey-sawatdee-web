@@ -126,7 +126,7 @@ export function ProjectShowcase() {
                 <span className="text-[10px] font-black font-mono text-indigo-600 uppercase tracking-wider block mb-1">
                   {"// Engineering Case Study"}
                 </span>
-                <DialogTitle className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
+                <DialogTitle className="text-xl md:text-2xl font-black font-sans text-slate-800 tracking-tight">
                   {selectedProject.title}
                 </DialogTitle>
                 <DialogDescription className="sr-only">
