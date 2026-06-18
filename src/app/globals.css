@@ -92,15 +92,38 @@
   --color-brick-red-500: #c1121f;
   --color-brick-red-400: #990e17;
   --color-molten-lava-700: #ff1616;
+  --color-white: #FAF9F6;
+  --color-black: #010013;
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  @keyframes shimmer-slide {
+    to {
+      transform: translate(calc(100cqw - 100%), 0);
+    }
+  }
+  @keyframes spin-around {
+    0% {
+      transform: translateZ(0) rotate(0);
+    }
+    15%, 35% {
+      transform: translateZ(0) rotate(90deg);
+    }
+    65%, 85% {
+      transform: translateZ(0) rotate(270deg);
+    }
+    100% {
+      transform: translateZ(0) rotate(360deg);
+    }
+  }
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --background: #FAF9F6;
+  --foreground: #010013;
+  --card: #FAF9F6;
+  --card-foreground: #010013;
+  --popover: #FAF9F6;
+  --popover-foreground: #010013;
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
@@ -196,7 +219,7 @@ input[type=number] {
 
 /* 5. Tracing-paper translucent card */
 .card-blueprint {
-  background-color: rgba(255, 255, 255, 0.80);
+  background-color: rgba(250, 249, 246, 0.80);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border: 1px solid #cbd5e1; /* thin solid border in slate-300 */

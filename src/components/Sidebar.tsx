@@ -10,14 +10,14 @@ import { FaGithub, FaLinkedin, FaEnvelope, FaYoutube } from 'react-icons/fa';
 // ── Navigation Data ──────────────────────────────────────────────────
 
 const topNav = [
-  { href: '/', icon: 'person', label: 'Portfolio Website' },
-  { href: '/overview', icon: 'bar_chart', label: 'Overview' },
+  { href: '/', icon: 'person', label: 'Portfolio' },
+  { href: '/overview', icon: 'bar_chart', label: 'Website Overview' },
 ];
 
 
 
 const bottomNav = [
-  { href: '/tools', icon: 'construction', label: 'Tools' },
+  { href: '/tools', icon: 'construction', label: 'My Tools' },
 ];
 
 const adminNav = [

@@ -6,6 +6,7 @@ import { HeroSection, ContactChannel } from '@/lib/portfolio-types';
 export type { HeroSection, ContactChannel };
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
+import { ShimmerButton } from '@/components/ui/shimmer-button';
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -20,30 +21,21 @@ const RESUME_FILE_PATH = '/assets/resume.pdf';
 
 export function PortfolioHero({ data, onViewResume }: { data: HeroSection; onViewResume: () => void }) {
   return (
-    <div className="card-blueprint p-8 md:p-12 bg-white/80 backdrop-blur-md relative overflow-hidden border-slate-200 shadow-sm text-center md:text-left">
-      <div className="space-y-6 relative z-10">
-        <div className="space-y-2">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-800 tracking-tighter uppercase font-mono leading-none">
-            {data.name} {data.nickname && <span className="text-slate-300">[{data.nickname}]</span>}
-          </h2>
-          <p className="text-[10px] font-black font-mono text-slate-400 uppercase tracking-[0.3em]">
-            {data.availability}
-          </p>
-        </div>
-        
-        <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl mx-auto md:mx-0 mb-8">
-          {data.headline}
-        </p>
-        
-        <div className="pt-4">
-          <button 
-            onClick={onViewResume}
-            className="inline-flex items-center gap-3 bg-slate-900 hover:bg-indigo-600 text-white font-black font-mono text-xs px-8 py-4 rounded-sm shadow-tactical transition-all hover:-translate-y-1 active:translate-y-0 uppercase tracking-widest"
-          >
-            <span className="material-symbols-outlined text-lg">description</span>
-            View Resume
-          </button>
-        </div>
+    <div className="pb-8 relative overflow-hidden text-center flex flex-col items-center gap-4">
+      <p className="text-slate-600 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+        Adaptable Software Engineer experienced in building full-stack applications (Next.js) and provisioning secure, high-availability AWS environments. Proficient in cloud automation using Terraform (IaC), custom VPC routing, and CloudFront security optimization.
+      </p>
+      <div className="relative z-10 flex justify-center">
+        <ShimmerButton 
+          onClick={onViewResume}
+          className="inline-flex items-center gap-3 font-black font-mono text-xs px-8 py-4 uppercase tracking-widest transition-all hover:-translate-y-1 shadow-[4px_4px_0px_0px_rgba(15,23,42,0.2)]"
+          borderRadius="100px"
+          background="#0f172a"
+          shimmerColor="#818cf8"
+        >
+          <span className="material-symbols-outlined text-lg">description</span>
+          View Resume
+        </ShimmerButton>
       </div>
     </div>
   );

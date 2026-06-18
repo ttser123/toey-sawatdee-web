@@ -42,7 +42,6 @@ export const RuleValidation = () => {
     <section className="card-blueprint p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-slate-800">
-          <span className="material-symbols-outlined bg-slate-100 p-2 text-slate-600 rounded-sm">analytics</span>
           <h2 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-slate-800">THE 50-30-20 PROTOCOL</h2>
         </div>
         <div className="sm:text-right">

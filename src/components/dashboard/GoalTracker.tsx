@@ -108,7 +108,6 @@ export const GoalTracker = ({ onAddMission }: { onAddMission?: () => void }) => 
     <section className="card-blueprint p-4 sm:p-6 md:p-8 space-y-6 h-full">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-indigo-600 bg-indigo-50 p-2 rounded-sm text-lg sm:text-xl">target</span>
           <h2 className="text-lg sm:text-xl font-bold uppercase tracking-tight text-slate-800">Active Missions</h2>
         </div>
       </div>

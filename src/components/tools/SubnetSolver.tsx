@@ -41,19 +41,19 @@ export default function SubnetCollisionSolver() {
     };
 
     return (
-        <div className="space-y-8 font-mono">
+        <div className="space-y-8 font-mono card-blueprint p-6 md:p-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* LEFT ARENA: CONFIGURATION */}
                 <div className="lg:col-span-2 space-y-8">
                     {/* SECTION 01: NETWORK INTERFACES */}
-                    <div className="bg-white border border-slate-200 p-6 shadow-[2px_2px_0px_0px_rgba(226,232,240,0.5)]">
+                    <div className="bg-white border-2 border-slate-300 rounded-sm p-6 shadow-[4px_4px_0px_0px_rgba(203,213,225,0.4)]">
                         <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
                             <h2 className="text-[11px] font-black uppercase tracking-widest text-slate-800 flex items-center gap-2">
                                 <span className="text-indigo-600">01.</span> Current Network Interfaces
                             </h2>
                             <button
                                 onClick={addInterface}
-                                className="text-[9px] font-black uppercase tracking-widest bg-slate-50 hover:bg-slate-100 px-3 py-1.5 border border-slate-200 text-slate-600 transition-all flex items-center gap-1.5"
+                                className="text-[9px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-600 hover:text-white transition-all hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(79,70,229,0.3)] px-3 py-1.5 flex items-center gap-1.5 rounded-sm"
                             >
                                 <span className="material-symbols-outlined text-xs">add</span> Add Row
                             </button>
@@ -93,7 +93,7 @@ export default function SubnetCollisionSolver() {
                                             </div>
                                             <button
                                                 onClick={() => removeInterface(net.id)}
-                                                className="px-4 border border-slate-200 text-slate-300 hover:text-red-500 hover:border-red-200 transition-colors disabled:opacity-0 rounded-sm sm:px-3"
+                                                className="px-4 border border-slate-200 bg-white text-slate-400 hover:text-white hover:bg-rose-500 hover:border-rose-600 transition-all hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(225,29,72,0.3)] disabled:opacity-0 rounded-sm sm:px-3"
                                                 disabled={networks.length === 1}
                                             >
                                                 <span className="material-symbols-outlined text-sm">delete</span>
@@ -107,7 +107,7 @@ export default function SubnetCollisionSolver() {
 
                     {/* SECTION 02-04: SERVICE, OS, BLOCK */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                        <div className="bg-white border border-slate-200 p-6">
+                        <div className="bg-white border-2 border-slate-300 rounded-sm p-6">
                             <h2 className="text-[11px] font-black uppercase tracking-widest text-slate-800 mb-6 border-b border-slate-100 pb-4">
                                 <span className="text-indigo-600">02.</span> Service
                             </h2>
@@ -118,7 +118,7 @@ export default function SubnetCollisionSolver() {
                                         onClick={() => setService(s)}
                                         className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-all border rounded-sm ${service === s
                                             ? 'bg-indigo-600 text-white border-indigo-700 shadow-[2px_2px_0px_0px_rgba(79,70,229,0.3)]'
-                                            : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50'
+                                            : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(199,210,254,0.5)]'
                                             }`}
                                     >
                                         [{s}]
@@ -127,7 +127,7 @@ export default function SubnetCollisionSolver() {
                             </div>
                         </div>
 
-                        <div className="bg-white border border-slate-200 p-6">
+                        <div className="bg-white border-2 border-slate-300 rounded-sm p-6">
                             <h2 className="text-[11px] font-black uppercase tracking-widest text-slate-800 mb-6 border-b border-slate-100 pb-4">
                                 <span className="text-indigo-600">03.</span> OS
                             </h2>
@@ -143,7 +143,7 @@ export default function SubnetCollisionSolver() {
                                                 ? 'bg-slate-800 text-white border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,0.3)]'
                                                 : isDisabled
                                                     ? 'bg-slate-50 text-slate-200 border-slate-100 cursor-not-allowed'
-                                                    : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50'
+                                                    : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100 hover:text-slate-800 hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(203,213,225,0.5)]'
                                                 }`}
                                         >
                                             [{t}]
@@ -157,7 +157,7 @@ export default function SubnetCollisionSolver() {
                                 </p>
                             )}
                         </div>
-                        <div className="bg-white border border-slate-200 p-6">
+                        <div className="bg-white border-2 border-slate-300 rounded-sm p-6">
                             <h2 className="text-[11px] font-black uppercase tracking-widest text-slate-800 mb-6 border-b border-slate-100 pb-4">
                                 <span className="text-indigo-600">04.</span> Block
                             </h2>
@@ -176,7 +176,7 @@ export default function SubnetCollisionSolver() {
                     {/* SECTION 05: CANDIDATE SELECTION (DESKTOP ONLY) */}
                     <div className="hidden lg:block">
                         {foundSubnets.length > 0 && (
-                            <div className="bg-white border border-slate-200 p-6 shadow-[2px_2px_0px_0px_rgba(226,232,240,0.5)] animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="bg-white border-2 border-slate-300 rounded-sm p-6 shadow-[4px_4px_0px_0px_rgba(203,213,225,0.4)] animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <h2 className="text-[11px] font-black uppercase tracking-widest text-slate-800 mb-6 border-b border-slate-100 pb-4">
                                     <span className="text-indigo-600">05.</span> Select Target Subnet
                                 </h2>
@@ -185,9 +185,9 @@ export default function SubnetCollisionSolver() {
                                         <button
                                             key={subnet}
                                             onClick={() => handleSelectSubnet(subnet)}
-                                            className={`relative p-4 border transition-all text-left rounded-sm group overflow-hidden ${selectedSubnet === subnet
+                                            className={`relative p-4 border transition-all duration-200 text-left rounded-sm group overflow-hidden ${selectedSubnet === subnet
                                                 ? 'border-indigo-600 bg-indigo-50 shadow-[4px_4px_0px_0px_rgba(79,70,229,0.2)] ring-1 ring-indigo-600'
-                                                : 'border-slate-200 bg-slate-50 hover:border-slate-400'
+                                                : 'border-slate-200 bg-white hover:bg-indigo-50/50 hover:border-indigo-300 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(199,210,254,0.5)]'
                                                 }`}
                                         >
                                             {idx === 0 && (
@@ -211,7 +211,7 @@ export default function SubnetCollisionSolver() {
 
                 {/* RIGHT SIDEBAR: ACTIONS & OUTPUT */}
                 <div className="space-y-8">
-                    <div className="bg-white border border-slate-200 p-6 space-y-4">
+                    <div className="bg-white border-2 border-slate-300 rounded-sm p-6 space-y-4">
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Search Depth</span>
                             <div className="flex items-center gap-2">
@@ -228,7 +228,7 @@ export default function SubnetCollisionSolver() {
                         </div>
                         <button
                             onClick={solve}
-                            className="w-full bg-slate-900 text-white py-6 text-xs font-black uppercase tracking-[0.2em] hover:bg-indigo-600 transition-all shadow-[6px_6px_0px_0px_rgba(15,23,42,0.1)] active:translate-x-1 active:translate-y-1 active:shadow-none rounded-sm"
+                            className="w-full bg-slate-900 text-white py-6 text-xs font-black uppercase tracking-[0.2em] transition-all hover:bg-indigo-600 hover:-translate-y-1 hover:shadow-[6px_8px_0px_0px_rgba(79,70,229,0.2)] shadow-[6px_6px_0px_0px_rgba(15,23,42,0.1)] active:translate-x-1 active:translate-y-1 active:shadow-none rounded-sm"
                         >
                             Execute Solver
                         </button>
@@ -237,7 +237,7 @@ export default function SubnetCollisionSolver() {
                     {/* SECTION 05: CANDIDATE SELECTION (MOBILE/TABLET ONLY) */}
                     <div className="lg:hidden">
                         {foundSubnets.length > 0 && (
-                            <div className="bg-white border border-slate-200 p-6 shadow-[2px_2px_0px_0px_rgba(226,232,240,0.5)] animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="bg-white border-2 border-slate-300 rounded-sm p-6 shadow-[4px_4px_0px_0px_rgba(203,213,225,0.4)] animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <h2 className="text-[11px] font-black uppercase tracking-widest text-slate-800 mb-4 border-b border-slate-100 pb-3">
                                     <span className="text-indigo-600">05.</span> Select Subnet
                                 </h2>
@@ -246,9 +246,9 @@ export default function SubnetCollisionSolver() {
                                         <button
                                             key={subnet}
                                             onClick={() => handleSelectSubnet(subnet)}
-                                            className={`relative p-3 border transition-all text-left rounded-sm group ${selectedSubnet === subnet
+                                            className={`relative p-3 border transition-all duration-200 text-left rounded-sm group ${selectedSubnet === subnet
                                                 ? 'border-indigo-600 bg-indigo-50 shadow-[4px_4px_0px_0px_rgba(79,70,229,0.2)]'
-                                                : 'border-slate-200 bg-slate-50'
+                                                : 'border-slate-200 bg-white hover:bg-indigo-50/50 hover:border-indigo-300 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(199,210,254,0.5)]'
                                                 }`}
                                         >
                                             <div className="flex items-center justify-between">
@@ -296,7 +296,7 @@ export default function SubnetCollisionSolver() {
                                     </pre>
                                     <button
                                         onClick={copyToClipboard}
-                                        className="absolute top-2 right-2 bg-indigo-600 text-white px-2 py-1 text-[8px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] rounded-sm"
+                                        className="absolute top-2 right-2 bg-indigo-600 text-white px-2 py-1 text-[8px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-all hover:-translate-y-0.5 hover:shadow-[2px_4px_0px_0px_rgba(0,0,0,0.3)] shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] active:translate-y-0 active:shadow-none rounded-sm"
                                     >
                                         {copied ? 'Copied' : 'Copy'}
                                     </button>

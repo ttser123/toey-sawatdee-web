@@ -37,7 +37,7 @@ export default function Home() {
   const closeResume = () => setIsResumeOpen(false);
 
   return (
-    <div className="flex flex-col min-h-[70vh] justify-center space-y-16 py-12">
+    <div className="flex flex-col space-y-10 pt-4 pb-12">
       <ScrollReveal variant="fade-down">
         <PortfolioHero 
           data={STATIC_HERO} 

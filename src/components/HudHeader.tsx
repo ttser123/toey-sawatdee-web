@@ -33,7 +33,7 @@ export default function HudHeader({
   return (
     <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6 border-b border-slate-300 pb-6">
       <div className="min-w-0">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-800 tracking-tighter font-mono uppercase">{title}</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-800 tracking-tighter font-mono">{title}</h1>
         <div className="flex items-center gap-2 mt-1">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 animate-radar-ping" />
