@@ -16,6 +16,18 @@ type ReleaseNote = {
 // ==========================================
 const releaseNotes: ReleaseNote[] = [
   {
+    date: 'June 18, 2026',
+    isoDate: '2026-06-18',
+    title: 'UI Modernization & Shadcn Integration (v2.4.0)',
+    changes: [
+      '**Shadcn UI Dialog Migration:** Completely replaced custom `createPortal` modals with Shadcn UI `<Dialog>` for the Resume Viewer and Project Case Studies, significantly improving accessibility, scroll-locking behavior, and focus management.',
+      '**Browser Native Alert Deprecation:** Eradicated blocking synchronous browser calls (`alert()` and `window.confirm()`) across all Finance Dashboard forms. Replaced them with non-blocking, stylistically consistent `<Alert>` banners and `<AlertDialog>` confirmation modals.',
+      '**Dynamic Typing Header:** Integrated MagicUI `TypingAnimation` into the global `HudHeader` and Hero Section, providing a terminal-like aesthetic that matches the Blueprint design system.',
+      '**Minimalist Layout Refinement:** Removed the clutter-heavy "Technical Skills" Marquee section from the home page, enforcing an ultra-minimalist, high-impact landing experience focused on deployed systems and core architecture.',
+      '**A4 PDF Scaling Engine:** Enhanced the Resume PDF viewer to dynamically scale with the viewport while locking the modal frame to 95vw, providing a comfortable, desktop-class reading experience.'
+    ]
+  },
+  {
     date: 'June 1, 2026',
     isoDate: '2026-06-01',
     title: 'Lighthouse Performance Overhaul & Hardware Acceleration (v2.3.0)',
