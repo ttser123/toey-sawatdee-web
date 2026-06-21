@@ -73,7 +73,7 @@ jobs:
               "docker pull ghcr.io/ttser123/toey-sawatdee/toey-sawatdee:latest",
               "docker stop toey-sawatdee || true",
               "docker rm toey-sawatdee || true",
-              "docker run -d -p 80:3000 --name toey-sawatdee -e CLOUDFRONT_DISTRIBUTION_ID='"$DIST_ID"' --restart unless-stopped ghcr.io/ttser123/toey-sawatdee/toey-sawatdee:latest"
+              "docker run -d -p 80:3000 --name toey-sawatdee -e CLOUDFRONT_DISTRIBUTION_ID='"$DIST_ID"' -e GOOGLE_GENERATIVE_AI_API_KEY=${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }} --restart unless-stopped ghcr.io/ttser123/toey-sawatdee/toey-sawatdee:latest"
             ]' \
             --comment "Secure Zero-SSH Deployment for toey-sawatdee" \
             --timeout-seconds 60 \
