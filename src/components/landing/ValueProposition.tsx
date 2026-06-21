@@ -1,6 +1,8 @@
 // src/components/landing/ValueProposition.tsx
 'use client';
 
+import { AuroraText } from "../ui/aurora-text";
+
 interface ValueRow {
   metric: string;
   tech: string;
@@ -40,7 +42,7 @@ export function ValueProposition() {
       {/* Section Header */}
       <div className="border-b border-slate-100 pb-4 mb-6">
         <h2 className="text-base sm:text-lg font-extrabold text-slate-800 uppercase tracking-tight">
-          Why This Architecture Matters
+          Why This <AuroraText>Architecture</AuroraText> Matters
         </h2>
         <p className="text-xs text-slate-500 mt-2 max-w-2xl leading-relaxed">
           Technical decisions translated into real business outcomes.

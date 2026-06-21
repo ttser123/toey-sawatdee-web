@@ -4,8 +4,6 @@ import dynamic from 'next/dynamic';
 import { FaGithub, FaLinkedin, FaEnvelope, FaYoutube, FaFileAlt } from 'react-icons/fa';
 import { HeroSection, ContactChannel } from '@/lib/portfolio-types';
 export type { HeroSection, ContactChannel };
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { ShimmerButton } from '@/components/ui/shimmer-button';
 import { Terminal, TypingAnimation, AnimatedSpan } from '@/components/ui/terminal';
 import { Marquee } from '@/components/ui/marquee';
@@ -13,9 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 // ── Types ────────────────────────────────────────────────────────────
 
 // ── Dynamic PDF Components ───────────────────────────────────────────
-
-const Document = dynamic(() => import('react-pdf').then(mod => mod.Document), { ssr: false });
-const Page = dynamic(() => import('react-pdf').then(mod => mod.Page), { ssr: false });
 
 const RESUME_FILE_PATH = '/assets/resume.pdf';
 
@@ -25,9 +20,14 @@ export function PortfolioHero({ data, onViewResume }: { data: HeroSection; onVie
   return (
     <div className="pb-16 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-12 max-w-6xl mx-auto px-4 md:px-8">
       <div className="flex-1 text-center lg:text-left flex flex-col items-center lg:items-start gap-8 z-10">
-        <p className="text-slate-600 text-sm md:text-base leading-relaxed max-w-xl">
-          Adaptable Software Engineer experienced in building full-stack applications (Next.js) and provisioning secure, high-availability AWS environments. Proficient in cloud automation using Terraform (IaC), custom VPC routing, and CloudFront security optimization.
-        </p>
+        <div className="flex flex-col gap-2 items-center lg:items-start text-center lg:text-left">
+          <span className="text-[20px] font-black font-mono text-indigo-600 uppercase tracking-[0.2em] block">
+            {"// About Me"}
+          </span>
+          <p className="text-slate-600 text-sm md:text-base leading-relaxed max-w-xl">
+            Adaptable Software Engineer experienced in building full-stack applications (Next.js) and provisioning secure, high-availability AWS environments. Proficient in cloud automation using Terraform (IaC), custom VPC routing, and CloudFront security optimization.
+          </p>
+        </div>
         <ShimmerButton 
           onClick={onViewResume}
           className="inline-flex items-center gap-3 font-black font-mono text-xs px-8 py-4 uppercase tracking-widest transition-all hover:-translate-y-1 shadow-[4px_4px_0px_0px_rgba(15,23,42,0.2)]"
@@ -85,9 +85,6 @@ export function PortfolioHero({ data, onViewResume }: { data: HeroSection; onVie
 // ── 2. Resume Modal ─────────────────────────────────────────────────
 
 export function ResumeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -104,10 +101,6 @@ export function ResumeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
           if (data.lastModified) setLastUpdated(data.lastModified);
         })
         .catch(err => console.error('Failed to fetch resume status:', err));
-
-      import('react-pdf').then(({ pdfjs }) => {
-        pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-      });
     }
   }, [isOpen]);
 
@@ -119,59 +112,30 @@ export function ResumeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         <DialogHeader className="p-4 border-b border-slate-200 bg-slate-50 shrink-0 text-left">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`w-2 h-2 rounded-full animate-pulse ${error ? 'bg-rose-500' : 'bg-indigo-500'}`} />
+              <div className="w-2 h-2 rounded-full animate-pulse bg-indigo-500" />
               <div className="flex flex-col">
                 <DialogTitle className="text-[20px] font-black text-slate-800 uppercase font-mono tracking-widest leading-none mb-1">
-                  {error ? 'Error: Access Failed' : 'Document Viewer: Resume'}
+                  Document Viewer: Resume
                 </DialogTitle>
-                {lastUpdated && !error && (
+                {lastUpdated && (
                   <span className="text-[17px] font-mono text-slate-400 uppercase tracking-tighter">
                     File Last Modified: {lastUpdated}
                   </span>
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-2 md:gap-4 pr-6">
-              <a href={RESUME_FILE_PATH} download="Parinya_Sawatdee_Resume.pdf" className="group flex items-center gap-2 px-3 py-1.5 hover:bg-indigo-600 hover:text-white transition-all text-slate-500 rounded-sm border border-transparent hover:border-indigo-400">
-                <span className="text-[10px] font-black font-mono uppercase tracking-widest hidden md:block">Download PDF</span>
-                <span className="material-symbols-outlined text-lg">download</span>
-              </a>
-            </div>
+
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto bg-slate-800 p-4 md:p-8 flex flex-col items-center custom-scrollbar relative gap-8">
-          {isLoading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4 bg-slate-900/50 backdrop-blur-sm z-10">
-              <div className="w-12 h-1 bg-slate-700 overflow-hidden rounded-full">
-                <div className="w-1/2 h-full bg-indigo-500 animate-[loading-bar_1.5s_infinite_ease-in-out]" />
-              </div>
-              <p className="text-[10px] font-black font-mono text-slate-400 uppercase tracking-[0.3em]">Loading Document...</p>
-            </div>
-          )}
-
-          {error ? (
-            <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-md mx-auto text-white mt-20">
-              <span className="material-symbols-outlined text-4xl text-rose-500">warning</span>
-              <p className="text-xs font-black font-mono text-rose-500 uppercase tracking-widest">{error}</p>
-            </div>
-          ) : (
-            <Document file={RESUME_FILE_PATH} onLoadSuccess={({ numPages }) => { setNumPages(numPages); setIsLoading(false); }} onLoadError={() => { setIsLoading(false); setError('FILE_NOT_FOUND'); }} className="flex flex-col items-center gap-8 pb-20">
-              {Array.from(new Array(numPages), (_, i) => (
-                <div key={i} className="shadow-2xl border-4 border-slate-700 bg-white">
-                  <Page pageNumber={i + 1} width={typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerWidth - 48 : 1000) : 1000} renderAnnotationLayer={true} renderTextLayer={true} />
-                </div>
-              ))}
-            </Document>
-          )}
+        <div className="flex-1 bg-slate-800 relative">
+          <iframe
+            src={RESUME_FILE_PATH}
+            className="w-full h-full border-none"
+            title="Resume PDF Viewer"
+          />
         </div>
       </DialogContent>
-      <style jsx global>{`
-        @keyframes loading-bar { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; border: 2px solid #1e293b; }
-      `}</style>
     </Dialog>
   );
 }

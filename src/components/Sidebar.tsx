@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { FaGithub, FaLinkedin, FaEnvelope, FaYoutube } from 'react-icons/fa';
+import { useChatStore } from '@/store/chatStore';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 // ── Navigation Data ──────────────────────────────────────────────────
 
@@ -17,6 +19,7 @@ const topNav = [
 
 
 const bottomNav = [
+  { href: '/tools/chat-bot', icon: 'smart_toy', label: 'AI Assistant' },
   { href: '/tools', icon: 'construction', label: 'My Tools' },
 ];
 
@@ -62,10 +65,14 @@ const NavItem = ({ href, icon, label, pathname, isOpen }: NavItemProps) => {
 export default function Sidebar() {
   const isOpen = true;
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isChatMenuOpen, setIsChatMenuOpen] = useState(false);
   const [visitorCount, setVisitorCount] = useState<number | string>('...');
+  const [showConfirmNewChat, setShowConfirmNewChat] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
+  const { triggerClear, savedMessages } = useChatStore();
+  const hasMessages = savedMessages.length > 0;
 
 
 
@@ -104,6 +111,11 @@ export default function Sidebar() {
 
   useEffect(() => {
     setIsMobileOpen(false);
+    if (pathname === '/tools/chat-bot') {
+      setIsChatMenuOpen(true);
+    } else {
+      setIsChatMenuOpen(false);
+    }
   }, [pathname]);
 
   useEffect(() => {
@@ -167,7 +179,56 @@ export default function Sidebar() {
             <NavItem key={item.href} {...item} pathname={pathname} isOpen={isOpen} />
           ))}
           {bottomNav.map((item) => (
-            <NavItem key={item.href} {...item} pathname={pathname} isOpen={isOpen} />
+            <div key={item.href}>
+              {item.href === '/tools/chat-bot' ? (
+                <div 
+                  className={`group relative flex items-center justify-between px-3 py-2.5 rounded-sm text-sm font-medium transition-colors cursor-pointer select-none ${
+                    pathname === '/tools/chat-bot'
+                      ? 'bg-indigo-50 text-indigo-600 border border-indigo-200'
+                      : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  }`}
+                  onClick={() => {
+                    if (pathname === '/tools/chat-bot') {
+                      setIsChatMenuOpen(!isChatMenuOpen);
+                    } else {
+                      router.push('/tools/chat-bot');
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-lg shrink-0">{item.icon}</span>
+                    <span className={`whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>{item.label}</span>
+                  </div>
+                  {pathname === '/tools/chat-bot' && (
+                    <span className={`material-symbols-outlined text-[16px] transition-transform duration-300 ${isChatMenuOpen ? 'rotate-180' : ''}`}>
+                      expand_more
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <NavItem {...item} pathname={pathname} isOpen={isOpen} />
+              )}
+              
+              {item.href === '/tools/chat-bot' && (
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isChatMenuOpen ? 'max-h-20 opacity-100 mt-1' : 'max-h-0 opacity-0 mt-0'}`}>
+                  <div className="relative ml-[22px] pl-4 border-l-2 border-slate-200">
+                    <div className="absolute top-1/2 left-0 w-3 h-[2px] bg-slate-200 -translate-y-1/2"></div>
+                    <button 
+                      onClick={() => hasMessages && setShowConfirmNewChat(true)} 
+                      disabled={!hasMessages}
+                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider font-mono transition-colors ${
+                        hasMessages 
+                          ? 'text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50 cursor-pointer' 
+                          : 'text-slate-300 cursor-not-allowed opacity-50'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[14px]">add_circle</span>
+                      New Chat
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ))}
           {isAuthenticated && (
             <>
@@ -218,6 +279,39 @@ export default function Sidebar() {
           )}
         </footer>
       </aside>
+
+      {/* ── New Chat Confirmation Dialog ── */}
+      <Dialog open={showConfirmNewChat} onOpenChange={setShowConfirmNewChat}>
+        <DialogContent className="w-[90vw] sm:max-w-[300px] p-5 bg-white border-slate-300 shadow-2xl rounded-sm">
+          <DialogHeader className="mb-2 text-left">
+            <DialogTitle className="text-base font-bold text-slate-900 font-sans flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[18px] text-rose-600">warning</span>
+              Start New Chat?
+            </DialogTitle>
+            <DialogDescription className="text-[13px] text-slate-500 mt-1 font-sans leading-relaxed">
+              This will clear your current conversation history. Are you sure you want to proceed?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <button
+              onClick={() => setShowConfirmNewChat(false)}
+              className="px-3 py-1.5 rounded-sm border border-slate-300 text-slate-600 hover:bg-slate-50 text-[11px] font-bold font-mono uppercase tracking-wider transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                triggerClear();
+                setShowConfirmNewChat(false);
+                if (isMobileOpen) setIsMobileOpen(false);
+              }}
+              className="px-3 py-1.5 rounded-sm bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold font-mono uppercase tracking-wider transition-colors"
+            >
+              Confirm
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

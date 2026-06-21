@@ -355,7 +355,7 @@ export function InteractiveArchitecture() {
       <div className="flex items-center justify-between border-b border-slate-200 pb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-base sm:text-lg font-bold uppercase tracking-tight text-slate-800">
-            Interactive Architecture Infrastructure
+            Interactive Architecture Infrastructure ⚒
           </h2>
         </div>
         <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 py-0.5 rounded-sm border bg-indigo-50 text-indigo-600 border-indigo-200 uppercase">

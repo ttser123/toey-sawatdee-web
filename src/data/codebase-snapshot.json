@@ -1,0 +1,17 @@
+{
+  "last_updated": "2026-06-22T01:00:00Z",
+  "tech_stack": {
+    "frontend": "Next.js 15, React 19, Tailwind CSS v4, Zustand",
+    "backend": "Next.js API Routes, Vercel AI SDK (@ai-sdk/google, gemini-3.1-flash-lite)",
+    "storage": "Local JSON / localStorage (for My Savings tool)"
+  },
+  "pipelines": {
+    "ci_cd": "GitHub Actions -> AWS SSM Run Command -> EC2 Docker Hosts",
+    "automation": "Zero-SSH deployment. Code pushed to main triggers build, pushes artifact, and SSM triggers docker-compose up."
+  },
+  "infrastructure": {
+    "cloud": "AWS (Amazon Web Services)",
+    "security": "VPC with public/private subnets, Security Groups restricting EC2 inbound to CloudFront Prefix Lists, Cognito for Auth",
+    "iac": "Terraform used to provision VPC, Subnets, EC2, and IAM roles."
+  }
+}

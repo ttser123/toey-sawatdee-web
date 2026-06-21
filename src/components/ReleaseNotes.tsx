@@ -16,6 +16,18 @@ type ReleaseNote = {
 // ==========================================
 const releaseNotes: ReleaseNote[] = [
   {
+    date: 'June 22, 2026',
+    isoDate: '2026-06-22',
+    title: 'Context-Aware AI Portfolio Assistant (v2.5.0)',
+    changes: [
+      '**Embedded AI Assistant:** Launched a fully integrated AI chatbot powered by the Vercel AI SDK and Gemini models, allowing users to query the portfolio\'s architecture, decisions, and tech stack interactively.',
+      '**Persistent Conversation State:** Integrated global Zustand state management to retain conversation history across navigation flows, ensuring context isn\'t lost when users switch pages.',
+      '**Polymorphic Markdown Engine:** Engineered a robust, defensive UI grid equipped with custom Markdown renderers capable of flawlessly parsing raw text, code blocks, and natively rendering complex Mermaid architecture flows.',
+      '**SRE-Grade Edge Protections:** Implemented rigorous payload sanitization and a 500-character payload cap, successfully mitigating Denial of Wallet (DoW) vectors alongside non-blocking UI alert systems.',
+      '**UX Workflow Enhancements:** Refactored project "Live Demo" routing to intelligently utilize Next.js App Router for internal navigation, delivering a seamless Single Page Application (SPA) experience.'
+    ]
+  },
+  {
     date: 'June 18, 2026',
     isoDate: '2026-06-18',
     title: 'UI Modernization & Shadcn Integration (v2.4.0)',

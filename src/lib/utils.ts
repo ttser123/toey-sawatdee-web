@@ -35,9 +35,9 @@ export const getCurrentMonth = () => {
 
 export const formatMonth = (monthStr: string) => {
   if (!monthStr) return '';
-  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-  const [year, month] = monthStr.split('-');
-  const monthIndex = parseInt(month) - 1;
-  return `${months[monthIndex]} ${year}`;
+  const [year, month] = monthStr.split('-').map(Number);
+  if (isNaN(year) || isNaN(month)) return monthStr;
+  const date = new Date(year, month - 1);
+  return new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(date).toUpperCase();
 };
 

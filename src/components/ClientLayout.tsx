@@ -8,14 +8,15 @@ import { TypingAnimation } from '@/components/ui/typing-animation';
 
 const getPageTitle = (pathname: string) => {
     if (pathname === '/') return <TypingAnimation duration={60} as="span">Hi, I'm Parinya👋</TypingAnimation>;
-    if (pathname === '/overview') return 'OVERVIEW';
-    if (pathname === '/tools') return 'TOOLS DIRECTORY';
-    if (pathname === '/tools/my-savings') return 'MYSAVINGS';
-    if (pathname === '/tools/env-tracker') return 'ENV TRACKER';
-    if (pathname === '/tools/subnet-solver') return 'SUBNET SOLVER';
-    if (pathname === '/admin/finance') return 'FINANCE';
-    if (pathname === '/admin/release-notes') return 'UPDATE LOGS';
-    if (pathname.includes('/admin/admin-log')) return 'ADMIN LOG';
+    if (pathname === '/overview') return 'Overview';
+    if (pathname === '/tools') return 'Tools & Utilities';
+    if (pathname === '/tools/my-savings') return 'My Savings';
+    if (pathname === '/tools/env-tracker') return 'ENV Tracker';
+    if (pathname === '/tools/subnet-solver') return 'Subnet Solver';
+    if (pathname === '/tools/chat-bot') return 'AI assistant';
+    if (pathname === '/admin/finance') return 'Finance';
+    if (pathname === '/admin/release-notes') return 'Release Notes';
+    if (pathname.includes('/admin/admin-log')) return 'Admin Log';
 
     const segments = pathname.split('/').filter(Boolean);
     if (segments.length === 0) return 'OVERVIEW';
@@ -29,6 +30,7 @@ const getPageSubtitle = (pathname: string) => {
     if (pathname === '/tools/my-savings') return 'Tactical Financial Tracking Engine';
     if (pathname === '/tools/env-tracker') return 'Blast Radius Simulator & AST Analysis';
     if (pathname === '/tools/subnet-solver') return 'Network Collision Resolution Tool';
+    if (pathname === '/tools/chat-bot') return 'Tactical LLM Operation Center';
     if (pathname === '/admin/finance') return 'Financial Administration Console';
     if (pathname === '/admin/release-notes') return 'System Changelog & Deployment History';
     if (pathname.includes('/admin/admin-log')) return 'Security & Authentication Audit Trail';
@@ -53,7 +55,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 <Sidebar />
                 <main className="flex-1 overflow-y-auto">
                     <div className="w-full max-w-7xl mx-auto p-4 md:p-8 lg:p-12 space-y-8 pb-24 animate-fade-in-composited">
-                        <HudHeader title={title} subtitle={subtitle} />
+                        {pathname !== '/tools/chat-bot' && (
+                            <HudHeader title={title} subtitle={subtitle} />
+                        )}
                         {children}
                     </div>
                 </main>

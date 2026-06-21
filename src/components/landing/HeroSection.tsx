@@ -1,5 +1,6 @@
 // src/components/landing/HeroSection.tsx
 'use client';
+import { AuroraText } from "@/components/ui/aurora-text"
 
 export function HeroSection() {
   const categories = [
@@ -15,7 +16,7 @@ export function HeroSection() {
     <div className="card-blueprint p-6 sm:p-10 relative overflow-hidden group hover:border-indigo-300 transition-colors">
       <div className="relative z-10">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">
-          Web <span className="text-indigo-600 font-mono tracking-tighter">Architecture</span>
+          Web <AuroraText>Architecture</AuroraText>
         </h1>
         <p className="text-slate-600 text-sm sm:text-base max-w-3xl leading-relaxed mb-8">
           A production-grade, server-side rendered application engineered for high availability, zero-downtime deployments, and edge-optimized delivery. Built to demonstrate absolute control over cloud infrastructure.

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { FaGithub } from 'react-icons/fa';
 import { PROJECTS_DATA, type ProjectItem } from '@/data/projects';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -8,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 export function ProjectShowcase() {
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -15,7 +18,11 @@ export function ProjectShowcase() {
 
   const handleProjectAction = (project: ProjectItem) => {
     if (project.liveUrl) {
-      window.open(project.liveUrl, '_blank', 'noopener,noreferrer');
+      if (project.liveUrl.startsWith('/')) {
+        router.push(project.liveUrl);
+      } else {
+        window.open(project.liveUrl, '_blank', 'noopener,noreferrer');
+      }
     } else if (project.details) {
       setSelectedProject(project);
     }
@@ -101,9 +108,15 @@ export function ProjectShowcase() {
                 )}
                 
                 {project.liveUrl ? (
-                  <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1.5 text-[10px] font-black font-mono uppercase tracking-widest ml-auto">
-                    Live Demo <span className="material-symbols-outlined text-xs align-middle">open_in_new</span>
-                  </a>
+                  project.liveUrl.startsWith('/') ? (
+                    <Link href={project.liveUrl} className="text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1.5 text-[10px] font-black font-mono uppercase tracking-widest ml-auto">
+                      Live Demo <span className="material-symbols-outlined text-xs align-middle">arrow_forward</span>
+                    </Link>
+                  ) : (
+                    <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1.5 text-[10px] font-black font-mono uppercase tracking-widest ml-auto">
+                      Live Demo <span className="material-symbols-outlined text-xs align-middle">open_in_new</span>
+                    </a>
+                  )
                 ) : project.details ? (
                   <button onClick={() => setSelectedProject(project)} className="text-slate-700 hover:text-indigo-600 transition-colors flex items-center gap-1.5 text-[10px] font-black font-mono uppercase tracking-widest ml-auto animate-pulse-subtle">
                     Read Case Study <span className="material-symbols-outlined text-xs align-middle">read_more</span>

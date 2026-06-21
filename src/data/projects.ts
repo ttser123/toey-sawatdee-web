@@ -66,4 +66,15 @@ export const PROJECTS_DATA: ProjectItem[] = [
       ]
     }
   },
+  {
+    id: 'ai-chat-assistant',
+    title: 'Context-Aware AI Portfolio Assistant',
+    category: 'Web App',
+    description: 'An embedded AI chatbot built with Vercel AI SDK and Gemini models to interactively query this portfolio\'s architecture, deployment pipelines, and technical stack.',
+    techStack: ['Next.js', 'Vercel AI SDK', 'Zustand', 'React Markdown', 'TailwindCSS'],
+    imageUrl: 'https://d3fs8bw8fuf5n4.cloudfront.net/assets/projects/AI Portfolio Assistant/AI-Portfolio Assistant.webp',
+    githubUrl: 'https://github.com/ttser123/toey-sawatdee',
+    liveUrl: '/tools/chat-bot',
+    featured: false
+  }
 ];
