@@ -140,7 +140,52 @@ export function ResumeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   );
 }
 
-// ── 3. Contact Section (Secure Channels) ───────────────────────────
+function VisitorCounterBadge() {
+  const [visitorCount, setVisitorCount] = useState<number | string>('...');
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchCounter = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) {
+          setVisitorCount('N/A');
+          return;
+        }
+        const cachedCount = sessionStorage.getItem('visitor_count');
+        if (cachedCount) {
+          setVisitorCount(Number(cachedCount));
+        } else {
+          const res = await fetch(`${apiUrl}/visitor`, {
+            method: 'POST',
+            signal: controller.signal,
+          });
+          if (res.ok) {
+            const json = await res.json();
+            const count = json.views ?? json.count ?? 'N/A';
+            setVisitorCount(count);
+            sessionStorage.setItem('visitor_count', String(count));
+          }
+        }
+      } catch (err: unknown) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setVisitorCount('Error');
+      }
+    };
+    fetchCounter();
+    return () => controller.abort();
+  }, []);
+
+  return (
+    <div className="mt-8 flex items-center justify-center">
+      <div className="flex items-center gap-2 text-slate-400">
+        <span className="text-[10px] font-mono font-black uppercase tracking-widest">
+          Pageviews: <span className="text-indigo-500">{visitorCount}</span>
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export function ContactSection({ 
   contacts, 
@@ -180,7 +225,7 @@ export function ContactSection({
           For professional inquiries and collaborations
         </p>
       </div>
-
+<VisitorCounterBadge />
       <div className="flex flex-col items-center gap-6">
         {/* 1. Primary Social Links */}
         <div className="flex flex-wrap justify-center gap-4">

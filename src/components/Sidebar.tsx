@@ -66,48 +66,12 @@ export default function Sidebar() {
   const isOpen = true;
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isChatMenuOpen, setIsChatMenuOpen] = useState(false);
-  const [visitorCount, setVisitorCount] = useState<number | string>('...');
   const [showConfirmNewChat, setShowConfirmNewChat] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
   const { triggerClear, savedMessages } = useChatStore();
   const hasMessages = savedMessages.length > 0;
-
-
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const fetchCounter = async () => {
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!apiUrl) {
-          setVisitorCount('N/A');
-          return;
-        }
-        const cachedCount = sessionStorage.getItem('visitor_count');
-        if (cachedCount) {
-          setVisitorCount(Number(cachedCount));
-        } else {
-          const res = await fetch(`${apiUrl}/visitor`, {
-            method: 'POST',
-            signal: controller.signal,
-          });
-          if (res.ok) {
-            const json = await res.json();
-            const count = json.views ?? json.count ?? 'N/A';
-            setVisitorCount(count);
-            sessionStorage.setItem('visitor_count', String(count));
-          }
-        }
-      } catch (err: unknown) {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-        setVisitorCount('Error');
-      }
-    };
-    fetchCounter();
-    return () => controller.abort();
-  }, []);
 
   useEffect(() => {
     setIsMobileOpen(false);
@@ -135,14 +99,19 @@ export default function Sidebar() {
   return (
     <>
       <header className="md:hidden flex items-center justify-between bg-slate-100/90 backdrop-blur-sm border-b border-slate-200 h-14 px-4 shrink-0">
-        <span className="font-semibold text-slate-800 text-sm">Portfolio Website</span>
-        <button
-          onClick={() => setIsMobileOpen(true)}
-          className="p-1.5 text-slate-500 hover:bg-slate-200 rounded-sm"
-          aria-label="Open navigation menu"
-        >
-          <span className="material-symbols-outlined">menu</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <span className="font-semibold text-slate-800 text-sm">Portfolio Website</span>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsMobileOpen(true)}
+            className="p-1.5 text-slate-500 hover:bg-slate-200 rounded-sm"
+            aria-label="Open navigation menu"
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+        </div>
       </header>
 
       {isMobileOpen && (
@@ -264,10 +233,6 @@ export default function Sidebar() {
                 parinya.zawatdee@gmail.com
               </span>
             </div>
-          </div>
-          <div className="group relative flex items-center gap-3 px-3 py-2.5 mb-1 text-slate-500 cursor-default hover:bg-slate-50 rounded-sm transition-colors" title={!isOpen ? `Profile Views: ${visitorCount}` : undefined}>
-            <span className="material-symbols-outlined text-lg shrink-0">visibility</span>
-            <span className={`text-xs font-medium font-mono whitespace-nowrap block ${isOpen ? 'md:block' : 'md:hidden'}`}>Profile Views: {visitorCount}</span>
           </div>
           {!isAuthenticated ? (
             <NavItem href="/login" icon="lock" label="Admin Login" pathname={pathname} isOpen={isOpen} />
