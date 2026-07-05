@@ -14,7 +14,7 @@ export function parseCronExpression(cronStr: string, count: number = 5): CronRes
 
   try {
     // Check for different exports depending on bundler and cron-parser version
-    const parse = parser.parseExpression 
+    const parse = (parser as any).parseExpression 
                || (parser as any).default?.parseExpression 
                || (parser as any).CronExpressionParser?.parse
                || (parser as any).default?.parse;
