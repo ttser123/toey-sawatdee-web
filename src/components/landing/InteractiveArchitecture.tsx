@@ -245,14 +245,6 @@ const ARCHITECTURE_DETAILS: Record<string, NodeDetail> = {
 
 export function InteractiveArchitecture() {
   const [selectedNode, setSelectedNode] = useState<NodeDetail | null>(null);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
-
-  useEffect(() => {
-    const checkViewport = () => setIsMobile(window.innerWidth < 1024);
-    checkViewport();
-    window.addEventListener('resize', checkViewport);
-    return () => window.removeEventListener('resize', checkViewport);
-  }, []);
 
   const nodeClass = 'bg-white border border-slate-300 text-slate-800 font-mono text-[10px] font-bold p-3 rounded-sm shadow-none text-center cursor-pointer hover:border-indigo-400 hover:bg-slate-50 transition-colors';
 
@@ -365,7 +357,7 @@ export function InteractiveArchitecture() {
 
       <div className="flex flex-col lg:flex-row gap-6 items-stretch min-h-[580px]">
         {/* Canvas Area */}
-        <div className="flex-1 border border-slate-300 rounded-sm relative overflow-hidden bg-blueprint" style={{ height: isMobile ? '350px' : 'auto' }}>
+        <div className="w-full h-[400px] lg:h-[580px] lg:flex-1 border border-slate-300 rounded-sm relative overflow-hidden bg-blueprint">
           <div className="absolute top-2 left-2 z-10 bg-white/90 border border-slate-200 px-2 py-1 rounded-sm shadow-none">
             <span className="text-[8px] font-mono text-slate-400 uppercase tracking-widest block">
               Drag to pan // Scroll to zoom // Click node to inspect
